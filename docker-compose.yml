@@ -1,0 +1,37 @@
+version: "3.9"
+
+volumes:
+  db_data:
+  storage:
+
+services:
+  app:
+    image: snipe/snipe-it:latest
+    container_name: snipeit_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - storage:/var/lib/snipeit
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+
+  db:
+    image: mariadb:11.4.7
+    container_name: snipeit_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: snipeit
+      MYSQL_USER: snipeit
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
