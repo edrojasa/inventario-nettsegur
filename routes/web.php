@@ -758,7 +758,14 @@ Route::group(['middleware' => 'web'], function () {
         ->where(['object_type' => 'assets|maintenances|hardware|models|users|locations|accessories|consumables|licenses|suppliers|components']);
 });
 
+use App\Http\Controllers\DeliveryController;
 
+Route::group(['middleware' => ['auth']], function () {
+
+    Route::get('remision', [DeliveryController::class, 'show'])->name('remision.show');
+    Route::get('remision/pdf', [DeliveryController::class, 'pdf'])->name('remision.pdf');
+
+});
 /**
  * Health check route - skip middleware
  */

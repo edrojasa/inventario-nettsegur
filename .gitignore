@@ -71,3 +71,10 @@ storage/ldap_client_tls.key
 /storage/framework/testing
 
 /.phpunit.cache
+
+/vendor
+/node_modules
+/.env
+/database/database.sqlite
+/public/storage
+/storage/*.key

@@ -12,6 +12,7 @@ services:
     ports:
       - "8000:80"
     volumes:
+      - ./:/var/www/html
       - storage:/var/lib/snipeit
     depends_on:
       db:

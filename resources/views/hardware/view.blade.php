@@ -252,6 +252,26 @@
                                     @endif
                                 @endif
 
+                                @if ($asset->assigned_to != '')
+    <div class="col-md-12 hidden-print" style="padding-top: 5px;">
+        <a href="{{ route('remision.show', ['assets[]' => $asset->id]) }}" 
+           target="_blank"
+           class="btn btn-sm btn-primary btn-social btn-block">
+            <x-icon type="file" />
+            Generar remisión
+        </a>
+    </div>
+
+    <div class="col-md-12 hidden-print" style="padding-top: 5px;">
+        <a href="{{ route('remision.pdf', ['assets[]' => $asset->id]) }}" 
+           target="_blank"
+           class="btn btn-sm btn-success btn-social btn-block">
+            <x-icon type="download" />
+            Descargar remisión
+        </a>
+    </div>
+@endif
+
                                         <!-- Add notes -->
                                         @can('update', \App\Models\Asset::class)
                                             <div class="col-md-12 hidden-print" style="padding-top: 5px;">
