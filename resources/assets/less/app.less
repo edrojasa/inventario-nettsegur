@@ -19,13 +19,83 @@ body {
 .skin-blue .main-header .logo {
   background-color: inherit !important;
 }
-.main-header .logo {
-  width: 100% !important;
-  white-space: nowrap;
+
+/* Top bar: room for company logo + long product name (flex layout below) */
+.main-header .navbar.navbar-static-top {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.main-header .navbar.navbar-static-top > .sidebar-toggle {
+  flex: 0 0 auto;
+}
+
+.main-header .navbar.navbar-static-top > .navbar-nav.navbar-left.main-header-brand {
+  float: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: ~"min(980px, 58vw)";
+  margin: 0;
+}
+
+.main-header .navbar.navbar-static-top > .navbar-custom-menu {
+  float: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: auto;
+}
+
+.main-header .navbar-static-top a.logo.navbar-brand {
+  width: auto !important;
+  max-width: 100%;
+  white-space: normal;
   text-align: left;
-  display: block;
-  clear: both;
-  //text-overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.85rem;
+  clear: none;
+  height: auto;
+  min-height: 54px;
+  line-height: 1.3;
+  padding: 10px 16px 10px 8px;
+}
+
+.main-header .navbar-static-top a.logo.navbar-brand .brand-site-title {
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.015em;
+}
+
+@media (min-width: 1200px) {
+  .main-header .navbar-static-top a.logo.navbar-brand .brand-site-title {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 991px) {
+  .left-navblock {
+    min-width: 240px;
+    max-width: ~"min(900px, 62vw)";
+  }
+
+  .main-header .navbar-static-top .navbar-brand-img {
+    max-width: ~"min(280px, 42vw)";
+  }
+}
+
+@media (max-width: 767px) {
+  .main-header .navbar-static-top a.logo.navbar-brand .brand-site-title {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header .navbar-static-top a.logo.navbar-brand {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
 }
 
 .huge {
@@ -368,12 +438,14 @@ a.accordion-header {
 /*END Form Wizard*/
 
 .left-navblock {
-  display: inline-block;
-  // float: left;
+  display: flex;
+  align-items: center;
   text-align: left;
   color: white;
-  padding: 0px;
-  /* adjust based on your layout */
+  padding: 0;
+  min-width: 340px;
+  max-width: ~"min(980px, 58vw)";
+  flex: 0 1 auto;
 }
 
 a.logo.no-hover a:hover {
@@ -400,6 +472,59 @@ input:required, select:required, textarea:required {
   white-space: normal;
 }
 
+/* Nettsegur: logo fijo al pie del menú lateral (misma imagen que marca web) */
+.main-sidebar .sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.main-sidebar .sidebar > .sidebar-menu {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-footer-brand {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 14px 10px 18px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-footer-brand-link {
+  display: inline-block;
+  line-height: 0;
+  opacity: 0.95;
+}
+
+.sidebar-footer-brand-link:hover,
+.sidebar-footer-brand-link:focus {
+  opacity: 1;
+}
+
+.sidebar-footer-brand-img {
+  max-width: 100%;
+  max-height: 52px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+@media (min-width: 768px) {
+  .sidebar-mini.sidebar-collapse .sidebar-footer-brand {
+    padding: 10px 6px 14px;
+  }
+
+  .sidebar-mini.sidebar-collapse .sidebar-footer-brand-img {
+    max-height: 34px;
+    max-width: 40px;
+  }
+}
+
 @media print {
   a[href]:after {
     content: none;
@@ -417,6 +542,17 @@ img.navbar-brand-img,
   float: left;
   padding: 5px 5px 5px 0;
   max-height: 50px;
+}
+
+.main-header .navbar-static-top .navbar-brand-img {
+  float: none;
+  flex-shrink: 0;
+  max-height: 50px;
+  max-width: ~"min(320px, 44vw)";
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  padding: 6px 12px 6px 0;
 }
 
 .input-daterange {
@@ -448,10 +584,6 @@ img.navbar-brand-img,
   padding-top: 20px;
   padding-bottom: 10px;
   max-width: 200px;
-}
-
-.left-navblock {
-  max-width: 500px;
 }
 
 @import "overrides.less";

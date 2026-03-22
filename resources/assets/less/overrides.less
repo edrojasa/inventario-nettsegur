@@ -292,13 +292,14 @@ a.accordion-header {
 /*END Form Wizard*/
 
 .left-navblock {
-  display: inline-block;
-  float: left;
+  display: flex;
+  align-items: center;
   text-align: left;
   color: white;
-  padding: 0px;
-  /* adjust based on your layout */
-
+  padding: 0;
+  min-width: 340px;
+  max-width: ~"min(980px, 58vw)";
+  flex: 0 1 auto;
 }
 
 .main-header
