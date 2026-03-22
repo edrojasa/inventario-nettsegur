@@ -503,6 +503,7 @@ return [
         'general' => 'General',
         'intervals' => 'Intervalos y umbrales',
         'logos' => 'Logos y pantalla',
+        'remision_pdf' => 'Remisiones de entrega (PDF)',
         'display' => 'Preferencias de pantalla',
         'mapping' => 'Mapeo de campos LDAP',
         'test' => 'Probar conexión LDAP',

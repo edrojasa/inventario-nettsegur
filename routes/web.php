@@ -763,7 +763,7 @@ use App\Http\Controllers\DeliveryController;
 Route::group(['middleware' => ['auth']], function () {
 
     Route::get('remision', [DeliveryController::class, 'show'])->name('remision.show');
-    Route::get('remision/pdf', [DeliveryController::class, 'pdf'])->name('remision.pdf');
+    Route::post('remision/pdf', [DeliveryController::class, 'pdf'])->name('remision.pdf');
 
 });
 /**

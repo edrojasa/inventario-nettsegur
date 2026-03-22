@@ -1484,7 +1484,7 @@
         <span style="margin:0 8px;color:#999;">|</span>
 
         <span style="color:#999;">
-            Nettsegur SmartAsset Platform
+            Nettsegur Smart Platform
         </span>
 
     </div>

@@ -479,6 +479,7 @@ return [
         'label_logo'                => 'Logo de etiqueta',
         'logo'                      => 'Site Logo',
         'favicon'                   => 'Favicon',
+        'remision_letterhead'       => 'Membrete remisiones (PDF)',
     ],
 
     'logo_help' => [
@@ -503,6 +504,7 @@ return [
         'general' => 'General',
         'intervals' => 'Intervals & Thresholds',
         'logos' => 'Logos & Display',
+        'remision_pdf' => 'Remisiones de entrega (PDF)',
         'display' => 'Display Preferences',
         'mapping' => 'LDAP Field Mapping',
         'test' => 'Test LDAP Connection',

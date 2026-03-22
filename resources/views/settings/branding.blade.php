@@ -198,6 +198,19 @@
                             "helpBlock" => trans('general.image_filetypes_help', ['size' => Helper::file_upload_max_size_readable()]),
                         ])
 
+                        <!-- Remisión PDF letterhead (subsección para que sea fácil de encontrar) -->
+                        <x-form.legend>
+                            {{ trans('admin/settings/general.legends.remision_pdf') }}
+                        </x-form.legend>
+
+                        @include('partials/forms/edit/uploadLogo', [
+                            "logoVariable" => "remision_letterhead",
+                            "logoId" => "uploadRemisionLetterhead",
+                            "logoLabel" => trans('admin/settings/general.logo_labels.remision_letterhead'),
+                            "logoClearVariable" => "clear_remision_letterhead",
+                            "helpBlock" => 'Imagen ancha (PNG/JPG) para encabezado de remisiones de entrega. ' . trans('general.image_filetypes_help', ['size' => Helper::file_upload_max_size_readable()]),
+                        ])
+
                         <!-- Favicon -->
                         @include('partials/forms/edit/uploadLogo', [
                             "logoVariable" => "favicon",

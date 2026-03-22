@@ -94,6 +94,11 @@
                     <x-slot:before_list>
 
                         <x-button.wide-checkout :item="$accessory" :route="route('accessories.checkout.show', $accessory->id)" />
+                        <div class="text-center" style="padding-top:8px;">
+                            <a href="{{ route('remision.show', ['accessory_id' => $accessory->id]) }}" class="btn btn-sm btn-primary btn-block">
+                                <x-icon type="file" /> Remisión (herramientas)
+                            </a>
+                        </div>
                         <x-button.wide-edit :item="$accessory" :route="route('accessories.edit', $accessory->id)" />
                         <x-button.wide-clone :item="$accessory" :route="route('clone/accessories', $accessory->id)" />
                         <x-button.wide-delete :item="$accessory" />

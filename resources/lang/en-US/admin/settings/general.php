@@ -480,6 +480,7 @@ return [
         'label_logo'                => 'Label Logo',
         'logo'                      => 'Site Logo',
         'favicon'                   => 'Favicon',
+        'remision_letterhead'       => 'Delivery note letterhead (PDF)',
     ],
 
     'logo_help' => [
@@ -504,6 +505,7 @@ return [
         'general' => 'General',
         'intervals' => 'Intervals & Thresholds',
         'logos' => 'Logos & Display',
+        'remision_pdf' => 'Delivery notes (PDF)',
         'display' => 'Display Preferences',
         'mapping' => 'LDAP Field Mapping',
         'test' => 'Test LDAP Connection',

@@ -230,6 +230,13 @@ class SettingsController extends Controller
                 $setting->acceptance_pdf_logo = null;
             }
 
+            // Remisión PDF letterhead (Nettsegur)
+            $setting = $request->handleImages($setting, 1200, 'remision_letterhead', '', 'remision_letterhead');
+            if ('1' == $request->input('clear_remision_letterhead')) {
+                $setting = $request->deleteExistingImage($setting, '', 'remision_letterhead');
+                $setting->remision_letterhead = null;
+            }
+
             // Favicon upload
             $setting = $request->handleImages($setting, 100, 'favicon', '', 'favicon');
             if ('1' == $request->input('clear_favicon')) {
