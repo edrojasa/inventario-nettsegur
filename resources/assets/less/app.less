@@ -44,6 +44,12 @@ body {
   flex: 1 1 auto;
   min-width: 0;
   margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 12px 0 8px;
 }
 
 .main-header .navbar-static-top a.logo.navbar-brand {
@@ -57,20 +63,42 @@ body {
   gap: 0.85rem;
   clear: none;
   height: auto;
-  min-height: 54px;
+  min-height: 60px;
   line-height: 1.3;
-  padding: 10px 16px 10px 8px;
+  padding: 10px 18px 10px 8px;
+  /* Sin filter/box-shadow aquí: el <a> envuelve logo+título y parece una “caja” */
+  transition: opacity 0.2s ease;
+}
+
+.main-header .navbar-static-top a.logo.navbar-brand:hover {
+  opacity: 0.98;
+}
+
+/* Profundidad solo en el logo (imagen), no en el contenedor del enlace */
+.main-header .navbar-static-top a.logo.navbar-brand:hover .navbar-brand-img {
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.38));
 }
 
 .main-header .navbar-static-top a.logo.navbar-brand .brand-site-title {
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.015em;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  /* Relieve solo en el texto */
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: text-shadow 0.2s ease;
+}
+
+.main-header .navbar-static-top a.logo.navbar-brand:hover .brand-site-title {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18),
+    0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
 @media (min-width: 1200px) {
   .main-header .navbar-static-top a.logo.navbar-brand .brand-site-title {
-    font-size: 17px;
+    font-size: 24px;
   }
 }
 
@@ -446,6 +474,13 @@ a.accordion-header {
   min-width: 340px;
   max-width: ~"min(980px, 58vw)";
   flex: 0 1 auto;
+  background: transparent;
+  box-shadow: none;
+}
+
+.main-header .navbar-nav.navbar-left.main-header-brand {
+  background: transparent;
+  box-shadow: none;
 }
 
 a.logo.no-hover a:hover {
@@ -547,12 +582,242 @@ img.navbar-brand-img,
 .main-header .navbar-static-top .navbar-brand-img {
   float: none;
   flex-shrink: 0;
-  max-height: 50px;
-  max-width: ~"min(320px, 44vw)";
+  max-height: 60px;
+  max-width: ~"min(420px, 50vw)";
   width: auto;
   height: auto;
   object-fit: contain;
-  padding: 6px 12px 6px 0;
+  padding: 6px 14px 6px 0;
+  /* Sombra solo en el dibujo del logo (no en el rectángulo del enlace) */
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+  transition: filter 0.2s ease;
+}
+
+/* Barra superior: profundidad, hover y toolbar (Nettsegur) */
+.main-header {
+  position: relative;
+  z-index: 1030;
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.main-header .navbar.navbar-static-top {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  min-height: 56px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.main-header .sidebar-toggle {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 6px;
+  margin: 6px 4px 6px 8px;
+}
+
+.main-header .sidebar-toggle:hover,
+.main-header .sidebar-toggle:focus {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Centro: atajos + búsqueda centrados en el espacio disponible */
+.main-header .navbar-toolbar-center {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.main-header .navbar-toolbar-center > .navbar-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  gap: 4px;
+  float: none;
+}
+
+.main-header .navbar-toolbar-center .navbar-nav > li {
+  flex-shrink: 0;
+}
+
+.main-header .navbar-toolbar-center .navbar-nav > li.header-search-li {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Derecha: usuario + ajustes (fijos, separados del centro) */
+.main-header .navbar-toolbar-end {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  margin-left: 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.main-header .navbar-toolbar-end > .navbar-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 0;
+  gap: 4px;
+  float: none;
+}
+
+.main-header .navbar-toolbar-center .navbar-nav > li > a,
+.main-header .navbar-toolbar-end .navbar-nav > li > a {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  border-radius: 8px;
+  margin: 5px 2px;
+  padding: 10px 12px;
+}
+
+.main-header .navbar-toolbar-center .navbar-nav > li:not(.header-search-li) > a:hover,
+.main-header .navbar-toolbar-center .navbar-nav > li:not(.header-search-li) > a:focus,
+.main-header .navbar-toolbar-end .navbar-nav > li > a:hover,
+.main-header .navbar-toolbar-end .navbar-nav > li > a:focus {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+.main-header .navbar-toolbar-center .navbar-nav > li.active > a {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
+
+.main-header .navbar-toolbar-end .navbar-nav > li.user-menu > a.dropdown-toggle {
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+/* Formulario de búsqueda: una sola “pill” con input + botón */
+.main-header .header-search-form {
+  margin: 6px 8px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  max-width: ~"min(420px, 36vw)";
+}
+
+.main-header .header-search-form > .col-xs-12.col-md-12 {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  width: auto !important;
+  max-width: 100%;
+  float: none !important;
+  padding: 0;
+}
+
+.main-header .header-search-form > .col-xs-12.col-md-12 > .col-xs-12.form-group {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  max-width: none;
+  float: none !important;
+  margin-bottom: 0;
+  padding: 0 !important;
+}
+
+.main-header .header-search-form > .col-xs-12.col-md-12 > .col-xs-1 {
+  flex: 0 0 auto;
+  width: auto !important;
+  float: none !important;
+  padding: 0 !important;
+}
+
+.main-header .header-search-form .form-control#tagSearch {
+  height: 38px;
+  border: none;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  padding-left: 12px;
+  font-size: 13px;
+}
+
+.main-header .header-search-form .form-control#tagSearch:focus {
+  outline: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18), 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.main-header .header-search-form #topSearchButton {
+  height: 38px;
+  border: none;
+  border-radius: 0 10px 10px 0;
+  margin: 0;
+  padding: 0 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.main-header .header-search-form #topSearchButton:hover,
+.main-header .header-search-form #topSearchButton:focus {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover sobre el bloque completo de búsqueda */
+.main-header .header-search-li {
+  transition: filter 0.2s ease, transform 0.15s ease;
+  border-radius: 12px;
+  padding: 2px;
+}
+
+.main-header .header-search-li:hover {
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.28));
+  transform: translateY(-1px);
+}
+
+@media (max-width: 991px) {
+  .main-header .header-search-form {
+    max-width: 260px;
+  }
+
+  .main-header .navbar-toolbar-center > .navbar-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .main-header .navbar-custom-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 8px 10px 10px;
+  }
+
+  .main-header .navbar-toolbar-center {
+    order: 1;
+    padding: 0;
+  }
+
+  .main-header .navbar-toolbar-end {
+    order: 2;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 10px 0 0;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .main-header .header-search-li {
+    flex-basis: 100%;
+  }
+
+  .main-header .header-search-form {
+    max-width: 100%;
+    margin: 8px 4px;
+  }
 }
 
 .input-daterange {
@@ -580,10 +845,99 @@ img.navbar-brand-img,
   color: #889195;
 }
 
-#login-logo {
-  padding-top: 20px;
-  padding-bottom: 10px;
-  max-width: 200px;
+/* --- Página de login (layouts/basic: body.login-page) --- */
+.login-page,
+.register-page {
+  min-height: 100vh;
+  /* Base más oscura + degradado multicapa (luz superior + viñeta + diagonal) */
+  background-color: #060d14 !important;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 50% -25%, rgba(60, 141, 188, 0.22), transparent 52%),
+    radial-gradient(ellipse 85% 55% at 110% 85%, rgba(0, 0, 0, 0.45), transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 60%, rgba(30, 90, 140, 0.12), transparent 45%),
+    linear-gradient(168deg, #0e2138 0%, #0a1828 28%, #07121c 58%, #040a10 100%) !important;
+  background-attachment: fixed;
+}
+
+.login-page .container {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Bloque del logo: centrado real en todo el ancho (solo si existe #login-logo) */
+body.login-page:has(#login-logo) > .text-center:first-of-type {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+  box-sizing: border-box;
+  margin-bottom: 12px; /* separa un poco la caja de login */
+}
+
+body.login-page:has(#login-logo) > .text-center:first-of-type > a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Tarjeta del formulario: relieve y sombra sin afectar el logo de arriba */
+.login-page .box.login-box {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border-top: 3px solid #3c8dbc;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 28px rgba(0, 0, 0, 0.18),
+    0 24px 48px rgba(0, 0, 0, 0.22);
+}
+
+.login-page .box.login-box .box-header.with-border {
+  border-bottom-color: #e8eaed;
+}
+
+/*
+ * Logo proporcional a la caja de login (~360px): un poco más ancho que el formulario,
+ * sin ocupar casi todo el viewport.
+ */
+body.login-page img#login-logo,
+.login-page img#login-logo {
+  display: inline-block;
+  padding-top: 28px;
+  padding-bottom: 16px;
+  max-width: ~"min(340px, 85vw)" !important;
+  max-height: ~"min(140px, 26vh)" !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 18px 40px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.08))
+    drop-shadow(0 0 48px rgba(60, 141, 188, 0.28));
+  transition: filter 0.25s ease;
+}
+
+.login-page .text-center > a:hover img#login-logo,
+.login-page .text-center > a:focus img#login-logo {
+  filter:
+    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 22px 48px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.12))
+    drop-shadow(0 0 64px rgba(60, 141, 188, 0.38));
+}
+
+@media (min-width: 992px) {
+  body.login-page img#login-logo,
+  .login-page img#login-logo {
+    max-width: ~"min(380px, 34vw)" !important;
+    max-height: ~"min(155px, 24vh)" !important;
+    padding-top: 32px;
+    padding-bottom: 20px;
+  }
 }
 
 @import "overrides.less";

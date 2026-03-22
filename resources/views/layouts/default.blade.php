@@ -1015,73 +1015,77 @@
                         </div>
                     </div>
 
-                    <!-- Navbar Right Menu -->
+                    <!-- Toolbar: centro (atajos + búsqueda) | derecha (usuario + ajustes) -->
                     <div class="navbar-custom-menu">
-                        <ul class="nav navbar-nav">
-                            @can('index', \App\Models\Asset::class)
-                                <li aria-hidden="true"{!! (request()->is('hardware*') ? ' class="active"' : '') !!}>
-                                    <a href="{{ url('hardware') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=1" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.assets') }}">
-                                        <x-icon type="assets" class="fa-fw" />
-                                        <span class="sr-only">{{ trans('general.assets') }}</span>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view', \App\Models\License::class)
-                                <li aria-hidden="true"{!! (request()->is('licenses*') ? ' class="active"' : '') !!}>
-                                    <a href="{{ route('licenses.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=2" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.licenses') }}">
-                                        <x-icon type="licenses" class="fa-fw" />
-                                        <span class="sr-only">{{ trans('general.licenses') }}</span>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('index', \App\Models\Accessory::class)
-                                <li aria-hidden="true"{!! (request()->is('accessories*') ? ' class="active"' : '') !!}>
-                                    <a href="{{ route('accessories.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=3" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.accessories') }}">
-                                        <x-icon type="accessories" class="fa-fw" />
-                                        <span class="sr-only">{{ trans('general.accessories') }}</span>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('index', \App\Models\Consumable::class)
-                                <li aria-hidden="true"{!! (request()->is('consumables*') ? ' class="active"' : '') !!}>
-                                    <a href="{{ url('consumables') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=4" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.consumables') }}">
-                                        <x-icon type="consumables" class="fa-fw" />
-                                        <span class="sr-only">{{ trans('general.consumables') }}</span>
-                                    </a>
-                                </li>
-                            @endcan
-                            @can('view', \App\Models\Component::class)
-                                <li aria-hidden="true"{!! (request()->is('components*') ? ' class="active"' : '') !!}>
-                                    <a href="{{ route('components.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=5" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.components') }}">
-                                        <x-icon type="components" class="fa-fw" />
-                                        <span class="sr-only">{{ trans('general.components') }}</span>
-                                    </a>
-                                </li>
-                            @endcan
+                        <div class="navbar-toolbar-center">
+                            <ul class="nav navbar-nav">
+                                @can('index', \App\Models\Asset::class)
+                                    <li aria-hidden="true"{!! (request()->is('hardware*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ url('hardware') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=1" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.assets') }}">
+                                            <x-icon type="assets" class="fa-fw" />
+                                            <span class="sr-only">{{ trans('general.assets') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view', \App\Models\License::class)
+                                    <li aria-hidden="true"{!! (request()->is('licenses*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ route('licenses.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=2" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.licenses') }}">
+                                            <x-icon type="licenses" class="fa-fw" />
+                                            <span class="sr-only">{{ trans('general.licenses') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('index', \App\Models\Accessory::class)
+                                    <li aria-hidden="true"{!! (request()->is('accessories*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ route('accessories.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=3" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.accessories') }}">
+                                            <x-icon type="accessories" class="fa-fw" />
+                                            <span class="sr-only">{{ trans('general.accessories') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('index', \App\Models\Consumable::class)
+                                    <li aria-hidden="true"{!! (request()->is('consumables*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ url('consumables') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=4" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.consumables') }}">
+                                            <x-icon type="consumables" class="fa-fw" />
+                                            <span class="sr-only">{{ trans('general.consumables') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view', \App\Models\Component::class)
+                                    <li aria-hidden="true"{!! (request()->is('components*') ? ' class="active"' : '') !!}>
+                                        <a href="{{ route('components.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=5" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.components') }}">
+                                            <x-icon type="components" class="fa-fw" />
+                                            <span class="sr-only">{{ trans('general.components') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
 
-                            @can('index', \App\Models\Asset::class)
-                                <li>
-                                    <form class="navbar-form navbar-left form-horizontal" role="search"
-                                          action="{{ route('findbytag/hardware') }}" method="get">
-                                        <div class="col-xs-12 col-md-12">
-                                            <div class="col-xs-12 form-group">
-                                                <label class="sr-only" for="tagSearch">
-                                                    {{ trans('general.lookup_by_tag') }}
-                                                </label>
-                                                <input type="text" class="form-control" id="tagSearch" name="assetTag" placeholder="{{ trans('general.lookup_by_tag') }}">
-                                                <input type="hidden" name="topsearch" value="true" id="search">
+                                @can('index', \App\Models\Asset::class)
+                                    <li class="header-search-li">
+                                        <form class="navbar-form navbar-left form-horizontal header-search-form" role="search"
+                                              action="{{ route('findbytag/hardware') }}" method="get">
+                                            <div class="col-xs-12 col-md-12">
+                                                <div class="col-xs-12 form-group">
+                                                    <label class="sr-only" for="tagSearch">
+                                                        {{ trans('general.lookup_by_tag') }}
+                                                    </label>
+                                                    <input type="text" class="form-control" id="tagSearch" name="assetTag" placeholder="{{ trans('general.lookup_by_tag') }}">
+                                                    <input type="hidden" name="topsearch" value="true" id="search">
+                                                </div>
+                                                <div class="col-xs-1">
+                                                    <button type="submit" id="topSearchButton" class="btn btn-theme pull-right">
+                                                        <x-icon type="search" />
+                                                        <span class="sr-only">{{ trans('general.search') }}</span>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="col-xs-1">
-                                                <button type="submit" id="topSearchButton" class="btn btn-theme pull-right">
-                                                    <x-icon type="search" />
-                                                    <span class="sr-only">{{ trans('general.search') }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </li>
-                            @endcan
-
+                                        </form>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </div>
+                        <div class="navbar-toolbar-end">
+                            <ul class="nav navbar-nav">
                             <!-- User Account: style can be found in dropdown.less -->
                             @if (Auth::check())
                                 <li class="dropdown user user-menu">
@@ -1150,7 +1154,8 @@
                                     </a>
                                 </li>
                             @endcan
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </nav>
                 <a href="#" style="float:left" class="sidebar-toggle-mobile visible-xs btn" data-toggle="push-menu"
