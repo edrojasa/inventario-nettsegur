@@ -8,13 +8,19 @@ use App\Models\Asset;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DeliveryController extends Controller
 {
-    /**
-     * Formulario de remisión: observaciones, tipo simple/múltiple, equipos y herramientas.
-     */
+
+public function index()
+{
+    $deliveries = \App\Models\Delivery::latest()->limit(10)->get();
+
+    return view('deliveries.index', compact('deliveries'));
+}
     public function show(Request $request)
     {
         $assetIds = array_filter((array) $request->input('assets', []));
@@ -31,7 +37,7 @@ class DeliveryController extends Controller
             $assets = Asset::whereIn('id', $assetIds)->get();
             $primaryAsset = $assets->first();
 
-            if ($primaryAsset && $primaryAsset->assigned_to !== '' && $primaryAsset->assigned_to !== null) {
+            if ($primaryAsset && $primaryAsset->assigned_to) {
                 $relatedAssets = Asset::where('assigned_to', $primaryAsset->assigned_to)
                     ->where('assigned_type', $primaryAsset->assigned_type)
                     ->whereNull('deleted_at')
@@ -59,11 +65,10 @@ class DeliveryController extends Controller
         }
 
         if ($assets->isEmpty() && ! $accessoryId) {
-            abort(404, 'Indique al menos un equipo (assets) o un accesorio (accessory_id).');
+            abort(404, 'Indique al menos un equipo o un accesorio.');
         }
 
         $allAssetOptions = $assets->concat($relatedAssets)->unique('id')->values();
-
         $settings = Setting::getSettings();
 
         return view('deliveries.remision-form', compact(
@@ -78,9 +83,6 @@ class DeliveryController extends Controller
         ));
     }
 
-    /**
-     * Generar PDF de remisión (POST con observaciones y selección de ítems).
-     */
     public function pdf(Request $request)
     {
         $request->validate([
@@ -96,7 +98,6 @@ class DeliveryController extends Controller
         $observaciones = $request->input('observaciones', '');
 
         $assetIds = array_map('intval', array_filter((array) $request->input('assets', [])));
-
         if ($modo === 'simple' && count($assetIds) > 1) {
             $assetIds = array_slice($assetIds, 0, 1);
         }
@@ -105,47 +106,86 @@ class DeliveryController extends Controller
             ? Asset::whereIn('id', $assetIds)->get()
             : collect();
 
-        if ($assets->isNotEmpty()) {
-            $this->authorize('index', Asset::class);
-        }
-
         $checkoutIds = array_map('intval', array_filter((array) $request->input('accessory_checkouts', [])));
         $accessoryRows = collect();
         if (count($checkoutIds) > 0) {
             $accessoryRows = AccessoryCheckout::whereIn('id', $checkoutIds)
                 ->with('accessory')
                 ->get();
-            foreach ($accessoryRows as $row) {
-                if ($row->accessory) {
-                    $this->authorize('view', $row->accessory);
-                }
-            }
         }
 
         if ($assets->isEmpty() && $accessoryRows->isEmpty()) {
-            abort(422, 'Debe incluir al menos un equipo o una herramienta en la remisión.');
+            abort(422, 'Debe incluir al menos un equipo o herramienta.');
         }
 
         $settings = Setting::getSettings();
         $letterheadSrc = $this->letterheadDataUri($settings);
 
+        // 🔥 Determinar destino
+        $targetUserId = null;
+        $targetLocationId = null;
+
+        if ($assets->isNotEmpty()) {
+            $first = $assets->first();
+            $targetUserId = $first->assigned_to;
+        }
+
+        // 🔥 Crear Delivery
+        $delivery = DB::transaction(function () use ($assets, $accessoryRows, $observaciones, $targetUserId, $targetLocationId) {
+
+            $folio = 'REM-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
+
+            $delivery = \App\Models\Delivery::create([
+                'folio'       => $folio,
+                'admin_id'    => auth()->id() ?? 1,
+                'user_id'     => $targetUserId,
+                'location_id' => $targetLocationId,
+                'status'      => 'generada',
+                'notes'       => $observaciones,
+            ]);
+
+            if ($assets->isNotEmpty()) {
+                $delivery->assets()->attach($assets->pluck('id'));
+            }
+
+            if ($accessoryRows->isNotEmpty()) {
+                $delivery->accessories()->attach(
+                    $accessoryRows->pluck('accessory_id')->filter()
+                );
+            }
+
+            return $delivery;
+        });
+
+        // 🔥 Generar PDF
         $pdf = Pdf::loadView('deliveries.remision', [
-            'assets' => $assets,
+            'delivery'      => $delivery, // 🔥 IMPORTANTE
+            'assets'        => $assets,
             'accessoryRows' => $accessoryRows,
             'observaciones' => $observaciones,
-            'modo' => $modo,
+            'modo'          => $modo,
             'letterheadSrc' => $letterheadSrc,
-            'settings' => $settings,
+            'settings'      => $settings,
         ])->setPaper('a4', 'portrait');
 
-        $filename = 'remision_entrega_' . now()->format('Y-m-d_His') . '.pdf';
+        // Guardar en storage/app/public/remisiones (disco storage_public).
+        // El disk 'public' de Snipe-IT suele ser public/uploads, no storage/app/public.
+        $disk = 'storage_public';
+        if (! Storage::disk($disk)->exists('remisiones')) {
+            Storage::disk($disk)->makeDirectory('remisiones');
+        }
 
-        return $pdf->download($filename);
+        $safeFolio = preg_replace('/[^A-Za-z0-9._-]+/', '_', $delivery->folio);
+        $filename = 'remisiones/' . $safeFolio . '.pdf';
+
+        Storage::disk($disk)->put($filename, $pdf->output());
+
+        // 🔥 GUARDAR RUTA
+        $delivery->update(['pdf_path' => $filename]);
+
+        return $pdf->download($delivery->folio . '.pdf');
     }
 
-    /**
-     * Data URI para DomPDF (imagen membrete en settings).
-     */
     protected function letterheadDataUri(?Setting $settings): ?string
     {
         if (! $settings || empty($settings->remision_letterhead)) {
@@ -158,8 +198,28 @@ class DeliveryController extends Controller
         }
 
         $mime = mime_content_type($path) ?: 'image/png';
-        $data = base64_encode((string) file_get_contents($path));
+        $data = base64_encode(file_get_contents($path));
 
-        return 'data:' . $mime . ';base64,' . $data;
+        return "data:$mime;base64,$data";
     }
+
+    public function download($id)
+{
+    $delivery = \App\Models\Delivery::findOrFail($id);
+
+    $path = storage_path('app/public/' . $delivery->pdf_path);
+
+    // 🔥 VERIFICAR SI EXISTE
+    if (!file_exists($path)) {
+        return "ERROR: No se encontró el archivo en: " . $path;
+    }
+
+    return response()->file($path);
+}
+public function showDelivery($id)
+{
+    $delivery = \App\Models\Delivery::with(['assets', 'accessories'])->findOrFail($id);
+
+    return view('deliveries.show', compact('delivery'));
+}
 }

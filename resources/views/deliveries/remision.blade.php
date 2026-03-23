@@ -72,9 +72,22 @@
     <div class="title">{{ optional($settings)->site_name ?? 'Nettsegur' }}</div>
 @endif
 
+<div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+    Remisión No: {{ $delivery->folio ?? 'SIN FOLIO' }}
+</div>
+
 <div class="title">Remisión de entrega de equipos y herramientas</div>
 <div class="meta muted">Fecha: {{ now()->format('d/m/Y H:i') }} &nbsp;|&nbsp; Modo: {{ $modo === 'multiple' ? 'Varios equipos' : 'Simple' }}</div>
 
+<p>
+    <strong>Asignado a:</strong>
+
+    @if($delivery->user)
+        {{ $delivery->user->name }}
+    @elseif($delivery->location)
+        {{ $delivery->location->name }}
+    @endif
+</p>
 <div class="meta">
     <strong>Entregado por:</strong> {{ optional(auth()->user())->name ?? optional(auth()->user())->username ?? 'Sistema' }}
 </div>

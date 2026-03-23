@@ -1221,6 +1221,13 @@
                             </li>
                         @endcan
 
+                        <li>
+                            <a href="/remisiones">
+                             <i class="fa fa-file"></i>
+                             <span>Remisiones</span>
+                            </a>
+                        </li>
+
                         @can('view', \App\Models\User::class)
                             <li id="users-sidenav-option"{!! (request()->is('users*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('users.index') }}" {{ $snipeSettings->shortcuts_enabled == 1 ? 'accesskey=6' : '' }}>

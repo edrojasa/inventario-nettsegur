@@ -782,3 +782,10 @@ Route::middleware(['auth'])->get(
     ->breadcrumbs(fn (Trail $trail) =>
     $trail->push('Home', route('home'))
     );
+
+    // 🔥 MÓDULO DE REMISIONES
+Route::prefix('remisiones')->group(function () {
+    Route::get('/', [\App\Http\Controllers\DeliveryController::class, 'index'])->name('remisiones.index');
+    Route::get('/{id}', [\App\Http\Controllers\DeliveryController::class, 'showDelivery'])->name('remisiones.show');
+    Route::get('/{id}/pdf', [\App\Http\Controllers\DeliveryController::class, 'download'])->name('remisiones.pdf');
+});

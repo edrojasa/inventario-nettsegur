@@ -48,6 +48,13 @@ $config = [
             'root' => storage_path(),
         ],
 
+        'public' => [
+    'driver' => 'local',
+    'root' => storage_path('app/public'),
+    'url' => env('APP_URL') . '/storage',
+    'visibility' => 'public',
+],
+
         // This applies the LOCAL public only, not S3/FTP/etc
         'local_public' => [
             'driver' => 'local',
@@ -109,6 +116,21 @@ $config = [
 // copy the selected PUBLIC_FILESYSTEM_DISK's configuration to the 'public' key for easy use
 // (by default, the PUBLIC_FILESYSTEM DISK is 'local_public', in the public/uploads directory)
 $config['disks']['public'] = $config['disks'][env('PUBLIC_FILESYSTEM_DISK','local_public')];
+
+/*
+|--------------------------------------------------------------------------
+| storage/app/public (symlink public/storage)
+|--------------------------------------------------------------------------
+| Disk 'public' arriba apunta a public/uploads en instalaciones típicas de Snipe-IT.
+| Para archivos que deben vivir en storage/app/public (p. ej. remisiones PDF),
+| usar siempre el disco 'storage_public'.
+*/
+$config['disks']['storage_public'] = [
+    'driver' => 'local',
+    'root' => storage_path('app/public'),
+    'url' => env('APP_URL').'/storage',
+    'visibility' => 'public',
+];
 
 // This is used to determine which files to accept, and also to populate the language strings for the upload-file blade
 $config['allowed_upload_extensions_array']  = [
