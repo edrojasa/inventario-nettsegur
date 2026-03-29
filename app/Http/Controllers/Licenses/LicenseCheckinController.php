@@ -9,6 +9,7 @@ use App\Models\License;
 use App\Models\LicenseSeat;
 use App\Models\User;
 use App\Models\Asset;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
@@ -80,18 +81,21 @@ class LicenseCheckinController extends Controller
             return redirect()->back()->withInput()->withErrors($validator);
         }
 
-        if($licenseSeat->assigned_to != null){
+        if ($licenseSeat->assigned_to != null) {
             $return_to = User::withTrashed()->find($licenseSeat->assigned_to);
             if ($return_to) {
                 session()->put('checkedInFrom', $return_to->id);
             }
-        } else {
+        } elseif ($licenseSeat->asset_id != null) {
             $return_to = Asset::find($licenseSeat->asset_id);
+        } else {
+            $return_to = Location::withTrashed()->find($licenseSeat->location_id);
         }
 
         // Update the asset data
         $licenseSeat->assigned_to = null;
         $licenseSeat->asset_id = null;
+        $licenseSeat->location_id = null;
         $licenseSeat->notes = $request->input('notes');
         if (! $licenseSeat->license->reassignable) {
             $licenseSeat->unreassignable_seat = true;
@@ -162,6 +166,25 @@ class LicenseCheckinController extends Controller
             if ($asset_seat->save()) {
                 Log::debug('Checking in '.$license->name.' from asset '.$asset_seat->asset_tag);
                 $asset_seat->logCheckin($asset_seat->asset, trans('admin/licenses/general.bulk.checkin_all.log_msg'));
+                $count++;
+            }
+        }
+
+        $licenseSeatsByLocation = LicenseSeat::where('license_id', '=', $licenseId)
+            ->whereNotNull('location_id')
+            ->with('assignedLocation')
+            ->get();
+
+        $license = $licenseSeatsByLocation->first()?->license;
+        foreach ($licenseSeatsByLocation as $location_seat) {
+            $loc = $location_seat->assignedLocation;
+            $location_seat->location_id = null;
+            if ($license && ! $license->reassignable) {
+                $location_seat->unreassignable_seat = true;
+            }
+            if ($location_seat->save()) {
+                Log::debug('Checking in '.$license->name.' from location '.$loc?->name);
+                $location_seat->logCheckin($loc, trans('admin/licenses/general.bulk.checkin_all.log_msg'));
                 $count++;
             }
         }

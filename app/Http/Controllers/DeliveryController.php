@@ -26,6 +26,7 @@ public function index()
         $assetIds = array_filter((array) $request->input('assets', []));
         $accessoryId = $request->input('accessory_id');
         $licenseIds = array_filter((array) $request->input('licenses', []));
+        $consumableIds = array_filter((array) $request->input('consumables', []));
 
         $assets = collect();
         $primaryAsset = null;
@@ -33,6 +34,11 @@ public function index()
         $accessoryCheckoutsForAssignee = collect();
         $accessoryCheckoutsForAccessory = collect();
         $licenses = collect();
+        $consumables = collect();
+
+        if (count($consumableIds) > 0) {
+            $consumables = \App\Models\ConsumableTransaction::with(['consumable', 'user', 'location'])->whereIn('id', $consumableIds)->get();
+        }
 
         if (count($assetIds) > 0) {
             $this->authorize('index', Asset::class);
@@ -86,7 +92,8 @@ public function index()
             'accessoryCheckoutsForAccessory',
             'accessoryId',
             'settings',
-            'licenses'
+            'licenses',
+            'consumables'
         ));
     }
 
@@ -128,8 +135,13 @@ public function index()
             ? \App\Models\License::whereIn('id', $licenseIds)->get()
             : collect();
 
-        if ($assets->isEmpty() && $accessoryRows->isEmpty() && $licenses->isEmpty()) {
-            abort(422, 'Debe incluir al menos un equipo, herramienta o licencia.');
+        $consumableTransactionIds = array_map('intval', array_filter((array) $request->input('consumables', [])));
+        $consumables = count($consumableTransactionIds) > 0
+            ? \App\Models\ConsumableTransaction::whereIn('id', $consumableTransactionIds)->get()
+            : collect();
+
+        if ($assets->isEmpty() && $accessoryRows->isEmpty() && $licenses->isEmpty() && $consumables->isEmpty()) {
+            abort(422, 'Debe incluir al menos un equipo, herramienta, licencia o consumible.');
         }
 
         $settings = Setting::getSettings();
@@ -145,7 +157,7 @@ public function index()
         }
 
         // 🔥 Crear Delivery
-        $delivery = DB::transaction(function () use ($assets, $accessoryRows, $observaciones, $targetUserId, $targetLocationId, $licenses) {
+        $delivery = DB::transaction(function () use ($assets, $accessoryRows, $observaciones, $targetUserId, $targetLocationId, $licenses, $consumables) {
 
             $folio = 'REM-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
 
@@ -172,15 +184,22 @@ public function index()
                 $delivery->licenses()->attach($licenses->pluck('id'));
             }
 
+            if ($consumables->isNotEmpty()) {
+                foreach ($consumables as $transaction) {
+                    $transaction->remision_id = $delivery->id;
+                    $transaction->save();
+                }
+            }
+
             return $delivery;
         });
 
-        // 🔥 Generar PDF
         $pdf = Pdf::loadView('deliveries.remision', [
             'delivery'      => $delivery, // 🔥 IMPORTANTE
             'assets'        => $assets,
             'accessoryRows' => $accessoryRows,
             'licenses'      => $licenses,
+            'consumables'   => $consumables,
             'observaciones' => $observaciones,
             'modo'          => $modo,
             'letterheadSrc' => $letterheadSrc,

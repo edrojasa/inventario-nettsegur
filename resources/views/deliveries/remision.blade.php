@@ -167,6 +167,38 @@
     </table>
 @endif
 
+@if (isset($consumables) && $consumables->isNotEmpty())
+    <h4 style="margin-bottom: 6px;">Consumibles</h4>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Consumible</th>
+            <th>Cantidad</th>
+            <th>Destino</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($consumables as $c => $con)
+            <tr>
+                <td>{{ $c + 1 }}</td>
+                <td>{{ $con->consumable ? $con->consumable->name : 'N/A' }}</td>
+                <td>{{ $con->quantity }}</td>
+                <td>
+                    @if($con->type == 'user' && $con->user)
+                        {{ $con->user->present()->fullName }}
+                    @elseif($con->type == 'location' && $con->location)
+                        {{ $con->location->name }}
+                    @else
+                        N/A
+                    @endif
+                </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+@endif
+
 <div class="signatures">
     <div class="firma">
         ___________________________<br>

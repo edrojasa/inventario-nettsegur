@@ -44,7 +44,10 @@ class AssetCheckoutController extends Controller
             return redirect()->route('hardware.edit', $asset)->withErrors($asset->getErrors());
         }
 
-        
+        if (session('checkout_to_type') === 'asset') {
+            session()->put(['checkout_to_type' => 'user']);
+        }
+
         if ($asset->availableForCheckout()) {
             return view('hardware/checkout', compact('asset'))
                 ->with('statusLabel_list', Helper::deployableStatusLabelList())

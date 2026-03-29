@@ -8,6 +8,7 @@ use App\Http\Transformers\LicenseSeatsTransformer;
 use App\Models\Asset;
 use App\Models\License;
 use App\Models\LicenseSeat;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,11 +27,11 @@ class LicenseSeatsController extends Controller
         if ($license = License::find($licenseId)) {
             $this->authorize('view', $license);
 
-            $seats = LicenseSeat::with('license', 'user', 'asset', 'user.department',  'user.company', 'asset.company')
+            $seats = LicenseSeat::with('license', 'user', 'asset', 'assignedLocation', 'user.department',  'user.company', 'asset.company')
                 ->where('license_seats.license_id', $licenseId);
 
             if ($request->input('status') == 'available') {
-                $seats->whereNull('license_seats.assigned_to')->whereNull('license_seats.asset_id');
+                $seats->whereNull('license_seats.assigned_to')->whereNull('license_seats.asset_id')->whereNull('license_seats.location_id');
             }
 
             if ($request->input('status') == 'assigned') {
@@ -103,7 +104,7 @@ class LicenseSeatsController extends Controller
                 'sometimes',
                 'int',
                 'nullable',
-                'prohibits:asset_id',
+                'prohibits:asset_id,location_id',
                 // must be a valid user or null to unassign
                 function ($attribute, $value, $fail) {
                     if (!is_null($value) && !User::where('id', $value)->whereNull('deleted_at')->exists()) {
@@ -115,11 +116,22 @@ class LicenseSeatsController extends Controller
                 'sometimes',
                 'int',
                 'nullable',
-                'prohibits:assigned_to',
+                'prohibits:assigned_to,location_id',
                 // must be a valid asset or null to unassign
                 function ($attribute, $value, $fail) {
                     if (!is_null($value) && !Asset::where('id', $value)->whereNull('deleted_at')->exists()) {
                         $fail('The selected asset_id is invalid.');
+                    }
+                },
+            ],
+            'location_id' => [
+                'sometimes',
+                'int',
+                'nullable',
+                'prohibits:assigned_to,asset_id',
+                function ($attribute, $value, $fail) {
+                    if (!is_null($value) && !Location::where('id', $value)->whereNull('deleted_at')->exists()) {
+                        $fail('The selected location_id is invalid.');
                     }
                 },
             ],
@@ -128,7 +140,7 @@ class LicenseSeatsController extends Controller
 
         $this->authorize('checkout', License::class);
 
-        $licenseSeat = LicenseSeat::with(['license', 'asset', 'user'])->find($seatId);
+        $licenseSeat = LicenseSeat::with(['license', 'asset', 'user', 'assignedLocation'])->find($seatId);
 
         if (!$licenseSeat) {
             return response()->json(Helper::formatStandardApiResponse('error', null, 'Seat not found'));
@@ -141,13 +153,26 @@ class LicenseSeatsController extends Controller
 
         $oldUser = $licenseSeat->user;
         $oldAsset = $licenseSeat->asset;
+        $oldLocation = $licenseSeat->assignedLocation;
 
         // attempt to update the license seat
         $licenseSeat->fill($validated);
 
+        if (array_key_exists('assigned_to', $validated) && $licenseSeat->assigned_to !== null) {
+            $licenseSeat->asset_id = null;
+            $licenseSeat->location_id = null;
+        }
+        if (array_key_exists('asset_id', $validated) && $licenseSeat->asset_id !== null) {
+            $licenseSeat->location_id = null;
+        }
+        if (array_key_exists('location_id', $validated) && $licenseSeat->location_id !== null) {
+            $licenseSeat->assigned_to = null;
+            $licenseSeat->asset_id = null;
+        }
+
         // check if this update is a checkin operation
         // 1. are relevant fields touched at all?
-        $assignmentTouched = $licenseSeat->isDirty('assigned_to') || $licenseSeat->isDirty('asset_id');
+        $assignmentTouched = $licenseSeat->isDirty('assigned_to') || $licenseSeat->isDirty('asset_id') || $licenseSeat->isDirty('location_id');
         $anythingTouched = $licenseSeat->isDirty();
 
         if (! $anythingTouched) {
@@ -160,23 +185,33 @@ class LicenseSeatsController extends Controller
         }
 
         // 2. are they cleared? if yes then this is a checkin operation
-        $is_checkin = ($assignmentTouched && $licenseSeat->assigned_to === null && $licenseSeat->asset_id === null);
+        $is_checkin = ($assignmentTouched && $licenseSeat->assigned_to === null && $licenseSeat->asset_id === null && $licenseSeat->location_id === null);
         $target = null;
 
-        // the logging functions expect only one "target". if both asset and user are present in the request,
-        // we simply let assets take precedence over users...
-        if ($licenseSeat->isDirty('assigned_to')) {
-            $target = $is_checkin ? $oldUser : User::find($licenseSeat->assigned_to);
-        }
-
-        if ($licenseSeat->isDirty('asset_id')) {
-            $target = $is_checkin ? $oldAsset : Asset::find($licenseSeat->asset_id);
+        if ($is_checkin) {
+            if ($licenseSeat->getOriginal('assigned_to')) {
+                $target = User::withTrashed()->find($licenseSeat->getOriginal('assigned_to'));
+            } elseif ($licenseSeat->getOriginal('asset_id')) {
+                $target = Asset::find($licenseSeat->getOriginal('asset_id'));
+            } elseif ($licenseSeat->getOriginal('location_id')) {
+                $target = Location::withTrashed()->find($licenseSeat->getOriginal('location_id'));
+            }
+        } else {
+            if ($licenseSeat->isDirty('assigned_to')) {
+                $target = User::find($licenseSeat->assigned_to);
+            }
+            if ($licenseSeat->isDirty('asset_id')) {
+                $target = Asset::find($licenseSeat->asset_id);
+            }
+            if ($licenseSeat->isDirty('location_id')) {
+                $target = Location::find($licenseSeat->location_id);
+            }
         }
 
         if ($assignmentTouched && is_null($target)){
-            // if both asset_id and assigned_to are null then we are "checking-in"
+            // if all assignment fields are null then we are "checking-in"
             // a related model that does not exist (possible purged or bad data).
-            if (!is_null($request->input('asset_id')) || !is_null($request->input('assigned_to'))) {
+            if (!is_null($request->input('asset_id')) || !is_null($request->input('assigned_to')) || !is_null($request->input('location_id'))) {
                 return response()->json(Helper::formatStandardApiResponse('error', null, 'Target not found'));
             }
         }

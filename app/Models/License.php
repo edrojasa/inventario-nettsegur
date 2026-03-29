@@ -207,7 +207,7 @@ class License extends Depreciable
         if ($oldSeats > $newSeats) {
 
             // Need to delete seats... lets see if if we have enough.
-            $seatsAvailableForDelete = $license->licenseseats()->whereNull('assigned_to')->whereNull('asset_id')->limit($change);
+            $seatsAvailableForDelete = $license->licenseseats()->whereNull('assigned_to')->whereNull('asset_id')->whereNull('location_id')->limit($change);
 
             if ($change > $seatsAvailableForDelete->count()) {
                 Session::flash('error', trans('admin/licenses/message.assoc_users'));
@@ -555,6 +555,7 @@ class License extends Depreciable
     {
         return LicenseSeat::whereNull('assigned_to')
             ->whereNull('asset_id')
+            ->whereNull('location_id')
             ->whereNull('deleted_at')
             ->count();
     }
@@ -578,6 +579,7 @@ class License extends Depreciable
         return $this->licenseSeatsRelation()
             ->whereNull('asset_id')
             ->whereNull('assigned_to')
+            ->whereNull('location_id')
             ->where('unreassignable_seat', '=', false)
             ->whereNull('deleted_at');
     }
@@ -610,7 +612,8 @@ class License extends Depreciable
         return $this->licenseSeatsRelation()->where(
             function ($query) {
                 $query->whereNotNull('assigned_to')
-                    ->orWhereNotNull('asset_id');
+                    ->orWhereNotNull('asset_id')
+                    ->orWhereNotNull('location_id');
             }
         );
     }
@@ -724,7 +727,8 @@ class License extends Depreciable
             ->where('unreassignable_seat', '=', false)
             ->where(function ($query) {
                 $query->whereNull('assigned_to')
-                    ->whereNull('asset_id');
+                    ->whereNull('asset_id')
+                    ->whereNull('location_id');
             })
             ->orderBy('id', 'asc')
             ->first();
@@ -740,7 +744,7 @@ class License extends Depreciable
      */
     public function freeSeats()
     {
-        return $this->hasMany(\App\Models\LicenseSeat::class)->whereNull('assigned_to')->whereNull('deleted_at')->whereNull('asset_id');
+        return $this->hasMany(\App\Models\LicenseSeat::class)->whereNull('assigned_to')->whereNull('deleted_at')->whereNull('asset_id')->whereNull('location_id');
     }
 
     public function scopeActiveLicenses($query)

@@ -303,7 +303,12 @@ class Consumable extends SnipeModel
      */
     public function numCheckedOut()
     {
-        return $this->consumables_users_count ?? $this->users()->count();
+        $userCount = $this->consumables_users_count ?? $this->users()->count();
+        $locationCount = \App\Models\ConsumableTransaction::where('consumable_id', $this->id)
+                            ->where('type', 'location')
+                            ->sum('quantity');
+        
+        return $userCount + $locationCount;
     }
 
     /**

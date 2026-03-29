@@ -78,8 +78,10 @@
 
 
 
-          <!-- User -->
-            @include ('partials.forms.edit.user-select', ['translated_name' => trans('general.select_user'), 'fieldname' => 'assigned_to', 'required'=> 'true'])
+          <!-- Assignment Selector -->
+            @include ('partials.forms.checkout-selector', ['user_select' => 'true','asset_select' => 'false', 'location_select' => 'true'])
+            @include ('partials.forms.edit.user-select', ['translated_name' => trans('general.user'), 'fieldname' => 'assigned_to', 'style' => (session('checkout_to_type') ?: 'user') == 'user' ? '' : 'display: none;'])
+            @include ('partials.forms.edit.location-select', ['translated_name' => trans('general.location'), 'fieldname' => 'assigned_location', 'style' => session('checkout_to_type') == 'location' ? '' : 'display: none;'])
 
 
             @if ($consumable->requireAcceptance() || $consumable->getEula() || ($snipeSettings->webhook_endpoint!=''))
@@ -127,6 +129,16 @@
               {!! $errors->first('note', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
             </div>
           </div>
+          <!-- Generate Remision -->
+          <div class="form-group">
+              <label class="col-md-3 control-label"></label>
+              <div class="col-md-7">
+                  <label>
+                      <input type="checkbox" name="generate_remision" value="1" class="minimal" {{ old('generate_remision') ? 'checked' : '' }}>
+                      &nbsp;Generar Remisión de Entrega al finalizar
+                  </label>
+              </div>
+          </div>
         </div> <!-- .box-body -->
             <x-redirect_submit_options
                     index_route="consumables.index"
@@ -141,4 +153,8 @@
 
   </div>
 </div>
+@stop
+
+@section('moar_scripts')
+    @include('partials/assets-assigned')
 @stop

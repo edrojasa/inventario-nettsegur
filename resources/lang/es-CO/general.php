@@ -42,6 +42,8 @@ return [
     'Auditar por'		    => 'Audited By',
     'audits'				=> 'Audits',
     'Registro de auditoría'	=> 'Registro de auditoría',
+    'asset'                 => 'Equipo',
+    'location'              => 'Locación',
     'assets'				=> 'Equipos',
     'assets_audited'        => 'Equipos auditados',
     'assets_checked_in_count'     => 'Equipos ingresados',

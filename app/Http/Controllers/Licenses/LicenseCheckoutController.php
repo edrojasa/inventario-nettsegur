@@ -6,12 +6,11 @@ use App\Events\CheckoutableCheckedOut;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LicenseCheckoutRequest;
-use App\Models\Accessory;
 use App\Models\Asset;
 use App\Models\License;
 use App\Models\LicenseSeat;
+use App\Models\Location;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class LicenseCheckoutController extends Controller
@@ -42,11 +41,6 @@ class LicenseCheckoutController extends Controller
             // Make sure the license is expired or terminated
             if ($license->isInactive()) {
                 return redirect()->route('licenses.index')->with('error', trans('admin/licenses/message.checkout.license_is_inactive'));
-            }
-
-            // We don't currently allow checking out licenses to locations, so we'll reset that to user if needed
-            if (session()->get('checkout_to_type') == 'location') {
-                session()->put(['checkout_to_type' => 'user']);
             }
 
             // Return the checkout view
@@ -92,20 +86,33 @@ class LicenseCheckoutController extends Controller
         $licenseSeat->created_by = auth()->id();
         $licenseSeat->notes = $request->input('notes');
 
+        $checkoutTarget = null;
+
         if ($request->filled('asset_id')) {
             session()->put(['checkout_to_type' => 'asset']);
             $checkoutTarget = $this->checkoutToAsset($licenseSeat);
-            $request->request->add(['assigned_asset' => $checkoutTarget->id]);
+            if ($checkoutTarget && ! ($checkoutTarget instanceof \Illuminate\Http\RedirectResponse)) {
+                $request->request->add(['assigned_asset' => $checkoutTarget->id]);
+            }
             session()->put(['redirect_option' => $request->input('redirect_option'), 'checkout_to_type' => 'asset']);
 
         } elseif ($request->filled('assigned_to')) {
             session()->put(['checkout_to_type' => 'user']);
             $checkoutTarget = $this->checkoutToUser($licenseSeat);
-            $request->request->add(['assigned_user' => $checkoutTarget->id]);
+            if ($checkoutTarget && ! ($checkoutTarget instanceof \Illuminate\Http\RedirectResponse)) {
+                $request->request->add(['assigned_user' => $checkoutTarget->id]);
+            }
             session()->put(['redirect_option' => $request->input('redirect_option'), 'checkout_to_type' => 'user']);
+
+        } elseif ($request->filled('assigned_location')) {
+            session()->put(['checkout_to_type' => 'location']);
+            $checkoutTarget = $this->checkoutToLocation($licenseSeat);
+            session()->put(['redirect_option' => $request->input('redirect_option'), 'checkout_to_type' => 'location']);
         }
 
-
+        if ($checkoutTarget && $checkoutTarget instanceof \Illuminate\Http\RedirectResponse) {
+            return $checkoutTarget;
+        }
 
         if ($checkoutTarget) {
 
@@ -144,6 +151,7 @@ class LicenseCheckoutController extends Controller
             return redirect()->route('licenses.index')->with('error', trans('admin/licenses/message.asset_does_not_exist'));
         }
         $licenseSeat->asset_id = request('asset_id');
+        $licenseSeat->location_id = null;
 
         // Override asset's assigned user if available
         if ($target->checkedOutToUser()) {
@@ -164,9 +172,29 @@ class LicenseCheckoutController extends Controller
             return redirect()->route('licenses.index')->with('error', trans('admin/licenses/message.user_does_not_exist'));
         }
         $licenseSeat->assigned_to = request('assigned_to');
+        $licenseSeat->asset_id = null;
+        $licenseSeat->location_id = null;
 
         if ($licenseSeat->save()) {
             event(new CheckoutableCheckedOut($licenseSeat, $target, auth()->user(), request('notes')));
+            return $target;
+        }
+
+        return false;
+    }
+
+    protected function checkoutToLocation($licenseSeat)
+    {
+        if (is_null($target = Location::find(request('assigned_location')))) {
+            return redirect()->route('licenses.index')->with('error', trans('admin/locations/message.does_not_exist'));
+        }
+        $licenseSeat->location_id = $target->id;
+        $licenseSeat->assigned_to = null;
+        $licenseSeat->asset_id = null;
+
+        if ($licenseSeat->save()) {
+            event(new CheckoutableCheckedOut($licenseSeat, $target, auth()->user(), request('notes')));
+
             return $target;
         }
 

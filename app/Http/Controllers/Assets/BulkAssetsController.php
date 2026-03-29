@@ -634,6 +634,10 @@ class BulkAssetsController extends Controller
         $do_not_change = ['' => trans('general.do_not_change')];
         $status_label_list = $do_not_change + Helper::deployableStatusLabelList();
 
+        if (session('checkout_to_type') === 'asset') {
+            session()->put(['checkout_to_type' => 'user']);
+        }
+
         return view('hardware/bulk-checkout', [
             'statusLabel_list' => $status_label_list,
             'removed_assets' => $alreadyAssigned,

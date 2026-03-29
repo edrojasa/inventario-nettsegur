@@ -28,6 +28,13 @@
                             count="{{ $consumable->numCheckedOut() }}"
                     />
 
+                    <x-tabs.nav-item
+                            name="delivery_transactions"
+                            class=""
+                            icon_type=""
+                            label="Transacciones"
+                    />
+
                     <x-tabs.files-tab count="{{ $consumable->uploads()->count() }}" />
 
                     <x-tabs.history-tab model="\App\Models\Consumable::class"/>
@@ -49,6 +56,56 @@
                             />
                         </x-slot:content>
 
+                    </x-tabs.pane>
+
+                    <x-tabs.pane name="delivery_transactions" class="">
+                        <x-slot:header>
+                            Transacciones
+                        </x-slot:header>
+                        <x-slot:content>
+                            <div class="table-responsive">
+                                <table class="table table-striped snipe-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Destino</th>
+                                            <th>Cantidad</th>
+                                            <th>Entregado Por</th>
+                                            <th>Notas</th>
+                                            <th>Remisión</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(\App\Models\ConsumableTransaction::where('consumable_id', $consumable->id)->orderBy('created_at', 'desc')->get() as $transaction)
+                                        <tr>
+                                            <td>{{ $transaction->created_at }}</td>
+                                            <td>
+                                                @if($transaction->type == 'user' && $transaction->user)
+                                                    <i class="fas fa-user"></i> {{ $transaction->user->present()->fullName }}
+                                                @elseif($transaction->type == 'location' && $transaction->location)
+                                                    <i class="fas fa-map-marker-alt"></i> {{ $transaction->location->name }}
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </td>
+                                            <td>{{ $transaction->quantity }}</td>
+                                            <td>{{ $transaction->admin ? $transaction->admin->present()->fullName : '' }}</td>
+                                            <td>{{ $transaction->notes }}</td>
+                                            <td>
+                                                <form action="{{ url('remision/pdf') }}" method="POST" target="_blank" style="display:inline;">
+                                                    @csrf
+                                                    <input type="hidden" name="consumables[]" value="{{ $transaction->id }}">
+                                                    <button type="submit" class="btn btn-sm btn-primary" data-tooltip="true" title="Re-imprimir Remisión">
+                                                        <i class="fas fa-file-pdf"></i> Imprimir
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </x-slot:content>
                     </x-tabs.pane>
 
                     <x-tabs.pane name="files">

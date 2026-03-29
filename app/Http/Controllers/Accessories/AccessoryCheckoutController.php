@@ -40,6 +40,10 @@ class AccessoryCheckoutController extends Controller
                     return redirect()->route('accessories.index')->with('error', trans('admin/accessories/message.checkout.unavailable'));
                 }
 
+                if (session('checkout_to_type') === 'asset') {
+                    session()->put(['checkout_to_type' => 'user']);
+                }
+
                 // Return the checkout view
                 return view('accessories/checkout', compact('accessory'));
             }

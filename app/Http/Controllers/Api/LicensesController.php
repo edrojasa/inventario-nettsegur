@@ -239,7 +239,7 @@ class LicensesController extends Controller
             // Delete the license and the associated license seats
             DB::table('license_seats')
                 ->where('id', $license->id)
-                ->update(['assigned_to' => null, 'asset_id' => null]);
+                ->update(['assigned_to' => null, 'asset_id' => null, 'location_id' => null]);
 
             $licenseSeats = $license->licenseseats();
             $licenseSeats->delete();

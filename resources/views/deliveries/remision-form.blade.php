@@ -160,6 +160,49 @@
                             </fieldset>
                         @endif
 
+                        @if (isset($consumables) && count($consumables) > 0)
+                            <fieldset style="margin-top: 15px;">
+                                <legend>Consumibles</legend>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>Seleccionar</th>
+                                            <th>Consumible</th>
+                                            <th>Cantidad</th>
+                                            <th>Destino</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach ($consumables as $transaction)
+                                            <tr>
+                                                <td class="text-center">
+                                                    <input type="checkbox" name="consumables[]"
+                                                           value="{{ $transaction->id }}" checked>
+                                                </td>
+                                                <td>
+                                                    @if($transaction->consumable)
+                                                        {{ $transaction->consumable->name }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{ $transaction->quantity }}
+                                                </td>
+                                                <td>
+                                                    @if($transaction->type == 'user' && $transaction->user)
+                                                        {{ $transaction->user->present()->fullName }}
+                                                    @elseif($transaction->type == 'location' && $transaction->location)
+                                                        {{ $transaction->location->name }}
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </fieldset>
+                        @endif
+
                         <fieldset>
                             <legend>Observaciones</legend>
                             <div class="form-group">
@@ -214,7 +257,7 @@
             if (form) {
                 form.addEventListener('submit', function (e) {
                     var any = false;
-                    document.querySelectorAll('input[name="assets[]"]:checked, input[name="accessory_checkouts[]"]:checked, input[name="licenses[]"]:checked').forEach(function (el) {
+                    document.querySelectorAll('input[name="assets[]"]:checked, input[name="accessory_checkouts[]"]:checked, input[name="licenses[]"]:checked, input[name="consumables[]"]:checked').forEach(function (el) {
                         if (el.checked) any = true;
                     });
                     if (!any) {

@@ -36,6 +36,7 @@ class LicenseSeat extends SnipeModel implements ICompanyableChild
     protected $fillable = [
         'assigned_to',
         'asset_id',
+        'location_id',
         'notes',
     ];
 
@@ -117,6 +118,11 @@ class LicenseSeat extends SnipeModel implements ICompanyableChild
         return $this->belongsTo(\App\Models\Asset::class, 'asset_id')->withTrashed();
     }
 
+    public function assignedLocation()
+    {
+        return $this->belongsTo(\App\Models\Location::class, 'location_id')->withTrashed();
+    }
+
     /**
      * Determines the assigned seat's location based on user
      * or asset its assigned to
@@ -127,6 +133,9 @@ class LicenseSeat extends SnipeModel implements ICompanyableChild
      */
     public function location()
     {
+        if ($this->location_id) {
+            return $this->assignedLocation;
+        }
         if (($this->user) && ($this->user->location)) {
             return $this->user->location;
         } elseif (($this->asset) && ($this->asset->location)) {
@@ -194,7 +203,8 @@ class LicenseSeat extends SnipeModel implements ICompanyableChild
         return $query->where(
             function ($query) {
                 $query->whereNotNull('assigned_to')
-                    ->orWhereNotNull('asset_id');
+                    ->orWhereNotNull('asset_id')
+                    ->orWhereNotNull('location_id');
             }
         );
 
