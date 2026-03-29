@@ -497,11 +497,8 @@
                       <th data-switchable="true" data-visible="false">
                         {{ trans('general.last_audit') }}
                       </th>
-                      <th data-switchable="true" data-visible="false">
+                    <th data-switchable="true" data-visible="false">
                         {{ trans('general.next_audit_date') }}
-                      </th>
-                    <th data-switchable="true" data-visible="false" data-formatter="trueFalseFormatter">
-                        {{ trans('general.byod') }}
                     </th>
 
                       @foreach ($field_array as $db_column => $field_name)
@@ -576,10 +573,6 @@
                         <td>
                           {{ Helper::getFormattedDateObject($asset->next_audit_date, 'date', false) }}
                         </td>
-
-                          <td>
-                              {{ $asset->byod }}
-                          </td>
 
                         @foreach ($field_array as $db_column => $field_value)
                           <td>

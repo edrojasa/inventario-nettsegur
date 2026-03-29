@@ -25,12 +25,14 @@ public function index()
     {
         $assetIds = array_filter((array) $request->input('assets', []));
         $accessoryId = $request->input('accessory_id');
+        $licenseIds = array_filter((array) $request->input('licenses', []));
 
         $assets = collect();
         $primaryAsset = null;
         $relatedAssets = collect();
         $accessoryCheckoutsForAssignee = collect();
         $accessoryCheckoutsForAccessory = collect();
+        $licenses = collect();
 
         if (count($assetIds) > 0) {
             $this->authorize('index', Asset::class);
@@ -64,8 +66,12 @@ public function index()
                 ->get();
         }
 
-        if ($assets->isEmpty() && ! $accessoryId) {
-            abort(404, 'Indique al menos un equipo o un accesorio.');
+        if (count($licenseIds) > 0) {
+            $licenses = \App\Models\License::whereIn('id', $licenseIds)->get();
+        }
+
+        if ($assets->isEmpty() && ! $accessoryId && $licenses->isEmpty()) {
+            abort(404, 'Indique al menos un equipo, accesorio o licencia.');
         }
 
         $allAssetOptions = $assets->concat($relatedAssets)->unique('id')->values();
@@ -79,7 +85,8 @@ public function index()
             'accessoryCheckoutsForAssignee',
             'accessoryCheckoutsForAccessory',
             'accessoryId',
-            'settings'
+            'settings',
+            'licenses'
         ));
     }
 
@@ -92,6 +99,8 @@ public function index()
             'assets.*' => 'integer|exists:assets,id',
             'accessory_checkouts' => 'nullable|array',
             'accessory_checkouts.*' => 'integer|exists:accessories_checkout,id',
+            'licenses' => 'nullable|array',
+            'licenses.*' => 'integer|exists:licenses,id',
         ]);
 
         $modo = $request->input('modo', 'simple');
@@ -114,8 +123,13 @@ public function index()
                 ->get();
         }
 
-        if ($assets->isEmpty() && $accessoryRows->isEmpty()) {
-            abort(422, 'Debe incluir al menos un equipo o herramienta.');
+        $licenseIds = array_map('intval', array_filter((array) $request->input('licenses', [])));
+        $licenses = count($licenseIds) > 0
+            ? \App\Models\License::whereIn('id', $licenseIds)->get()
+            : collect();
+
+        if ($assets->isEmpty() && $accessoryRows->isEmpty() && $licenses->isEmpty()) {
+            abort(422, 'Debe incluir al menos un equipo, herramienta o licencia.');
         }
 
         $settings = Setting::getSettings();
@@ -131,7 +145,7 @@ public function index()
         }
 
         // 🔥 Crear Delivery
-        $delivery = DB::transaction(function () use ($assets, $accessoryRows, $observaciones, $targetUserId, $targetLocationId) {
+        $delivery = DB::transaction(function () use ($assets, $accessoryRows, $observaciones, $targetUserId, $targetLocationId, $licenses) {
 
             $folio = 'REM-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
 
@@ -154,6 +168,10 @@ public function index()
                 );
             }
 
+            if ($licenses->isNotEmpty()) {
+                $delivery->licenses()->attach($licenses->pluck('id'));
+            }
+
             return $delivery;
         });
 
@@ -162,6 +180,7 @@ public function index()
             'delivery'      => $delivery, // 🔥 IMPORTANTE
             'assets'        => $assets,
             'accessoryRows' => $accessoryRows,
+            'licenses'      => $licenses,
             'observaciones' => $observaciones,
             'modo'          => $modo,
             'letterheadSrc' => $letterheadSrc,
@@ -218,7 +237,7 @@ public function index()
 }
 public function showDelivery($id)
 {
-    $delivery = \App\Models\Delivery::with(['assets', 'accessories'])->findOrFail($id);
+    $delivery = \App\Models\Delivery::with(['assets', 'accessories', 'licenses', 'user', 'location'])->findOrFail($id);
 
     return view('deliveries.show', compact('delivery'));
 }

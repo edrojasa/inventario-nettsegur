@@ -74,7 +74,7 @@
                         </a>
                     </li>
 
-                    <li>
+                    {{--<li>
                         <a href="#components" data-toggle="tab">
                           <span class="hidden-lg hidden-md">
                             <x-icon type="components" class="fa-2x" />
@@ -85,9 +85,9 @@
                             {!! ($asset->components->count() > 0 ) ? '<span class="badge badge-secondary">'.number_format($asset->components->count()).'</span>' : '' !!}
 
                         </a>
-                    </li>
+                    </li> --}}
 
-                    <li>
+                    {{--<li>
                         <a href="#assets" data-toggle="tab">
                           <span class="hidden-lg hidden-md">
                             <x-icon type="assets" class="fa-2x" />
@@ -98,7 +98,7 @@
                             {!! ($asset->assignedAssets()->count() > 0 ) ? '<span class="badge badge-secondary">'.number_format($asset->assignedAssets()->count()).'</span>' : '' !!}
 
                         </a>
-                    </li>
+                    </li>--}}
 
                     @if ($asset->assignedAccessories->count() > 0)
                         <li>
@@ -164,7 +164,7 @@
                     </li>
 
                     @can('view', $asset->model)
-                    <li>
+                    {{--<li>
                         <a href="#modelfiles" data-toggle="tab">
                           <span class="hidden-lg hidden-md">
                               <x-icon type="more-files" class="fa-2x" />
@@ -174,7 +174,7 @@
                             </span>
                             {!! ($asset->model) && ($asset->model->uploads->count() > 0 ) ? '<span class="badge badge-secondary">'.number_format($asset->model->uploads->count()).'</span>' : '' !!}
                         </a>
-                    </li>
+                    </li>--}}
                     @endcan
 
 
@@ -693,16 +693,6 @@
                                             @if (($asset->model) && ($asset->model->model_number!=''))
                                                 <x-copy-to-clipboard copy_what="model_number">{{ ($asset->model) ? $asset->model->model_number : ''}}</x-copy-to-clipboard>
                                             @endif
-                                        </div>
-                                    </div>
-
-                                    <!-- byod -->
-                                    <div class="row byod">
-                                        <div class="col-md-3">
-                                            <strong>{{ trans('general.byod') }}</strong>
-                                        </div>
-                                        <div class="col-md-9">
-                                            {!! ($asset->byod=='1') ? '<i class="fas fa-check text-success" aria-hidden="true"></i> '.trans('general.yes') : '<i class="fas fa-times text-danger" aria-hidden="true"></i> '.trans('general.no')  !!}
                                         </div>
                                     </div>
 

@@ -143,6 +143,30 @@
     </table>
 @endif
 
+@if (isset($licenses) && $licenses->isNotEmpty())
+    <h4 style="margin-bottom: 6px;">Licencias</h4>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Serial / Clave</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($licenses as $l => $lic)
+            <tr>
+                <td>{{ $l + 1 }}</td>
+                <td>{{ $lic->name }}</td>
+                <td>{{ $lic->category ? $lic->category->name : 'N/A' }}</td>
+                <td>{{ $lic->serial ?: '—' }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+@endif
+
 <div class="signatures">
     <div class="firma">
         ___________________________<br>

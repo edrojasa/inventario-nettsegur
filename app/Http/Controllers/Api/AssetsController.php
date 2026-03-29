@@ -114,7 +114,6 @@ class AssetsController extends Controller
             'checkout_counter',
             'checkin_counter',
             'requests_counter',
-            'byod',
             'asset_eol_date',
             'requestable',
             'jobtitle',
@@ -295,11 +294,6 @@ class AssetsController extends Controller
                 // more sad, horrible workarounds for laravel bugs when doing full text searches
                 $assets->whereNotNull('assets.assigned_to');
                 break;
-            case 'byod':
-                // This is kind of redundant, since we already check for byod=1 above, but this keeps the
-                // sidebar nav links a little less chaotic
-                $assets->where('assets.byod', '=', '1');
-                break;
             default:
 
                 if ((! $request->filled('status_id')) && ($settings->show_archived_in_list != '1')) {
@@ -380,10 +374,6 @@ class AssetsController extends Controller
 
         if ($request->filled('depreciation_id')) {
             $assets->ByDepreciationId($request->input('depreciation_id'));
-        }
-
-        if ($request->filled('byod')) {
-            $assets->where('assets.byod', '=', $request->input('byod'));
         }
 
         if ($request->filled('order_number')) {

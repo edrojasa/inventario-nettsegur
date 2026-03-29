@@ -240,7 +240,7 @@ return [
     'edit_note'              => 'Editar nota',
     'note_deleted'            => 'Nota eliminada',
     'delete_note'              => 'Borrar nota',
-    'order_number'          => 'Número de orden',
+    'order_number'          => 'Número de Factura',
     'only_deleted'          => 'Solo activos eliminados',
     'page_menu'				=> 'Mostrando elementos de _MENU_',
     'page_error'            => 'Could not determine previous page. Redirected to homepage.',

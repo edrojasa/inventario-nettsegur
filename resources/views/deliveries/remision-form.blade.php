@@ -82,6 +82,40 @@
                             </fieldset>
                         @endif
 
+                        @if (isset($licenses) && $licenses->isNotEmpty())
+                            <fieldset>
+                                <legend>Licencias</legend>
+                                <p class="help-block">Seleccione las licencias a incluir en esta remisión.</p>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th style="width:48px;">Incluir</th>
+                                            <th>Licencia</th>
+                                            <th>Categoría</th>
+                                            <th>Clave Serial / Notas</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach ($licenses as $l)
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox"
+                                                           name="licenses[]"
+                                                           value="{{ $l->id }}"
+                                                           checked>
+                                                </td>
+                                                <td>{{ $l->name }}</td>
+                                                <td>{{ $l->category ? $l->category->name : '' }}</td>
+                                                <td>{{ $l->serial ?: '—' }}</td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </fieldset>
+                        @endif
+
                         @if ($accessoryCheckoutsForAssignee->isNotEmpty() || $accessoryCheckoutsForAccessory->isNotEmpty())
                             @php
                                 $accRows = $accessoryCheckoutsForAccessory->isNotEmpty()
@@ -180,7 +214,7 @@
             if (form) {
                 form.addEventListener('submit', function (e) {
                     var any = false;
-                    document.querySelectorAll('input[name="assets[]"]:checked, input[name="accessory_checkouts[]"]:checked').forEach(function (el) {
+                    document.querySelectorAll('input[name="assets[]"]:checked, input[name="accessory_checkouts[]"]:checked, input[name="licenses[]"]:checked').forEach(function (el) {
                         if (el.checked) any = true;
                     });
                     if (!any) {

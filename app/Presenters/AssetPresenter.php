@@ -309,15 +309,6 @@ class AssetPresenter extends Presenter
                 'visible' => false,
                 'title' => trans('general.next_audit_date'),
                 'formatter' => 'dateDisplayFormatter',
-            ], [
-                'field' => 'byod',
-                'searchable' => false,
-                'sortable' => true,
-                'visible' => false,
-                'title' => trans('general.byod'),
-                'class' => 'byod',
-                'formatter' => 'trueFalseFormatter',
-
             ],
         ];
 

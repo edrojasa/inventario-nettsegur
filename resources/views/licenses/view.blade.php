@@ -52,6 +52,14 @@
                 @can('update', $license)
                     <x-tabs.nav-item-upload />
                 @endcan
+
+                <x-tabs.nav-item
+                        name="users"
+                        icon_type="users"
+                        label="Usuarios"
+                        tooltip="Usuarios registrados para esta licencia"
+                />
+
                 </x-slot:tabnav>
 
                 <x-slot:tabpanes>
@@ -118,6 +126,67 @@
                     @endcan
                     <!-- end files tab pane -->
 
+                    <!-- start users tab pane -->
+                    <x-tabs.pane name="users">
+                        <x-slot:header>
+                            Usuarios
+                        </x-slot:header>
+                        <x-slot:content>
+                            <div class="row">
+                                <div class="col-md-12 text-right" style="margin-bottom: 10px;">
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
+                                        <i class="fas fa-plus icon-white"></i> Agregar Usuario
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped snipe-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>Contraseña</th>
+                                            <th>Creado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($license->licenseUsers as $userCred)
+                                            <tr>
+                                                <td>{{ $userCred->username }}</td>
+                                                <td>
+                                                    <div class="input-group" style="width: 250px;">
+                                                        <input type="password" class="form-control input-sm" id="pwd-{{ $userCred->id }}" value="{{ \Illuminate\Support\Facades\Crypt::decryptString($userCred->password) }}" readonly>
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default btn-sm toggle-password" type="button" data-target="pwd-{{ $userCred->id }}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>{{ $userCred->created_at->format('Y-m-d H:i') }}</td>
+                                                <td>
+                                                    <form method="POST" action="{{ route('licenses.users.destroy', ['licenseId' => $license->id, 'id' => $userCred->id]) }}" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        @if($license->licenseUsers->isEmpty())
+                                            <tr>
+                                                <td colspan="4" class="text-center">No hay usuarios agregados todavía.</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        </x-slot:content>
+                    </x-tabs.pane>
+                    <!-- end users tab pane -->
+
                 </x-slot:tabpanes>
             </x-tabs>
         </x-page-column>
@@ -137,6 +206,12 @@
                                 <x-icon type="clone" />
                                 {{ trans('admin/licenses/general.clone') }}</a>
                         @endcan
+
+                        <div class="hidden-print" style="padding-top: 5px; padding-bottom: 5px; border-bottom: 1px solid transparent;"></div>
+                        <a href="{{ route('remision.show', ['licenses' => [$license->id]]) }}" class="btn btn-sm btn-primary bg-purple btn-social btn-block hidden-print" style="margin-bottom: 5px;">
+                            <x-icon type="file" />
+                            Generar remisión
+                        </a>
 
                         @can('checkout', $license)
 
@@ -221,6 +296,35 @@
 
   @can('update', \App\Models\License::class)
     @include ('modals.upload-file', ['item_type' => 'license', 'item_id' => $license->id])
+
+    <!-- Modal Add User -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form method="POST" action="{{ route('licenses.users.store', ['licenseId' => $license->id]) }}">
+            @csrf
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="addUserModalLabel">Añadir Nuevo Usuario</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="text" class="form-control" id="password" name="password" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   @endcan
 
 @stop
@@ -228,4 +332,20 @@
 
 @section('moar_scripts')
   @include ('partials.bootstrap-table')
+  <script>
+    $(function() {
+        $('.toggle-password').click(function() {
+            var inputId = $(this).data('target');
+            var input = $('#' + inputId);
+            var icon = $(this).find('i');
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+    });
+  </script>
 @stop

@@ -67,4 +67,14 @@ class Delivery extends SnipeModel
                     ->withPivot('notes')
                     ->withTimestamps();
     }
+
+    /**
+     * Relación N:M Polimórfica (Licencias)
+     */
+    public function licenses()
+    {
+        return $this->morphedByMany(License::class, 'item', 'delivery_items')
+                    ->withPivot('notes')
+                    ->withTimestamps();
+    }
 }

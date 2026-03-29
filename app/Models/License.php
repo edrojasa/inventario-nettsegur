@@ -691,6 +691,11 @@ class License extends Depreciable
         return $this->hasMany(\App\Models\LicenseSeat::class);
     }
 
+    public function licenseUsers()
+    {
+        return $this->hasMany(\App\Models\LicenseUser::class);
+    }
+
     /**
      * Establishes the license -> supplier relationship
      *

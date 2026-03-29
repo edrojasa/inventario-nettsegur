@@ -1051,14 +1051,14 @@
                                         </a>
                                     </li>
                                 @endcan
-                                @can('view', \App\Models\Component::class)
+                                {{-- @can('view', \App\Models\Component::class)
                                     <li aria-hidden="true"{!! (request()->is('components*') ? ' class="active"' : '') !!}>
                                         <a href="{{ route('components.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=5" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.components') }}">
                                             <x-icon type="components" class="fa-fw" />
                                             <span class="sr-only">{{ trans('general.components') }}</span>
                                         </a>
                                     </li>
-                                @endcan
+                                @endcan --}}
 
                                 @can('index', \App\Models\Asset::class)
                                     <li class="header-search-li">
@@ -1212,14 +1212,14 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('view', \App\Models\Component::class)
+                        {{--@can('view', \App\Models\Component::class)
                             <li id="components-sidenav-option"{!! (request()->is('components*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('components.index') }}">
                                     <x-icon type="components" class="fa-fw" />
                                     <span>{{ trans('general.components') }}</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
 
                         <li>
                             <a href="/remisiones">

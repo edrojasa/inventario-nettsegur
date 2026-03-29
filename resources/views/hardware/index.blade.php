@@ -32,8 +32,6 @@
     {{ trans('general.archived') }}
   @elseif ($requestStatus=='Deleted')
     {{ ucfirst(trans('general.deleted')) }}
-  @elseif ($requestStatus=='byod')
-    {{ strtoupper(trans('general.byod')) }}
   @endif
 @else
 {{ trans('general.all') }}

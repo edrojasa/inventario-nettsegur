@@ -36,7 +36,7 @@ return [
     'months'			=> 'meses',
     'name'				=> 'Nombre del activo',
     'notes'				=> 'Notas',
-    'order'				=> 'Número de orden',
+    'order'				=> 'Número de Factura',
     'qr'				=> 'Código QR',
     'requestable'		=> 'Los usuarios pueden solicitar este elemento',
     'redirect_to_all'   => 'Regresar a :type',

@@ -54,6 +54,9 @@ Route::group(['prefix' => 'licenses', 'middleware' => ['auth']], function () {
             'getExportLicensesCsv'
         ]
     )->name('licenses.export');
+
+    Route::post('{licenseId}/users', [\App\Http\Controllers\LicenseUsersController::class, 'store'])->name('licenses.users.store');
+    Route::delete('{licenseId}/users/{id}', [\App\Http\Controllers\LicenseUsersController::class, 'destroy'])->name('licenses.users.destroy');
 });
 
 Route::resource('licenses', Licenses\LicensesController::class, [

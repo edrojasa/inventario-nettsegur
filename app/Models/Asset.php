@@ -120,7 +120,6 @@ class Asset extends Depreciable
         'supplier_id'       => ['nullable', 'exists:suppliers,id'],
         'asset_eol_date'    => ['nullable', 'date'],
         'eol_explicit'      => ['nullable', 'boolean'],
-        'byod'              => ['nullable', 'boolean'],
         'order_number'      => ['nullable', 'string', 'max:191'],
         'notes'             => ['nullable', 'string', 'max:65535'],
         'assigned_to'   => ['nullable', 'integer', 'required_with:assigned_type'],
@@ -158,7 +157,6 @@ class Asset extends Depreciable
         'requestable',
         'last_checkout',
         'expected_checkin',
-        'byod',
         'asset_eol_date',
         'eol_explicit',
         'last_audit_date',
@@ -216,6 +214,11 @@ class Asset extends Depreciable
 
         static::softDeleted(function (Asset $asset) {
             $asset->requests()->delete();
+        });
+
+        /* BYOD desactivado en la app: no se expone en UI y siempre se guarda en 0 */
+        static::saving(function (Asset $asset) {
+            $asset->byod = 0;
         });
     }
 

@@ -150,18 +150,6 @@
                 @include ('partials.forms.edit.warranty')
                 @include ('partials.forms.edit.datepicker', ['translated_name' => trans('admin/hardware/form.expected_checkin'),'fieldname' => 'expected_checkin'])
                 @include ('partials.forms.edit.datepicker', ['translated_name' => trans('general.next_audit_date'),'fieldname' => 'next_audit_date', 'help_text' => trans('general.next_audit_date_help')])
-                <!-- byod checkbox -->
-                <div class="form-group byod">
-                    <div class="col-md-7 col-md-offset-3">
-                        <label class="form-control">
-                            <input type="checkbox" value="1" name="byod" {{ (old('remote', $item->byod)) == '1' ? ' checked="checked"' : '' }} aria-label="byod">
-                            {{ trans('general.byod') }}
-                        </label>
-                        <p class="help-block">
-                            {{ trans('general.byod_help') }}
-                        </p>
-                    </div>
-                </div>
 
             </div> <!-- end optional details -->
         </fieldset>
@@ -184,15 +172,6 @@
                 @include ('partials.forms.edit.datepicker', ['translated_name' => trans('general.purchase_date'),'fieldname' => 'purchase_date'])
                 @include ('partials.forms.edit.datepicker', ['translated_name' => trans('admin/hardware/form.eol_date'),'fieldname' => 'asset_eol_date'])
                 @include ('partials.forms.edit.supplier-select', ['translated_name' => trans('general.supplier'), 'fieldname' => 'supplier_id'])
-
-                @php
-                    $currency_type = null;
-                    if ($item->id && $item->location) {
-                        $currency_type = $item->location->currency;
-                    }
-                @endphp
-
-                @include ('partials.forms.edit.purchase_cost', ['currency_type' => $currency_type])
 
             </div> <!-- end order details -->
         </fieldset>

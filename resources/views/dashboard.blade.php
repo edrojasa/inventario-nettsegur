@@ -106,7 +106,7 @@
         </a>
     </div><!-- ./col -->
 
-    <div class="col-lg-2 col-xs-6">
+    {{-- <div class="col-lg-2 col-xs-6">
         <!-- small components box -->
         <a href="{{ route('components.index') }}">
             <div class="dashboard small-box bg-yellow">
@@ -123,7 +123,7 @@
                 </span>
             </div>
         </a>
-    </div><!-- ./col -->
+    </div> --}}<!-- ./col -->
 
     <div class="col-lg-2 col-xs-6">
         <!-- small users box -->

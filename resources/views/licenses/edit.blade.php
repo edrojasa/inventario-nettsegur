@@ -77,8 +77,7 @@
 
 
 @include ('partials.forms.edit.supplier-select', ['translated_name' => trans('general.supplier'), 'fieldname' => 'supplier_id'])
-@include ('partials.forms.edit.order_number')
-@include ('partials.forms.edit.purchase_cost')
+
 @include ('partials.forms.edit.datepicker', ['translated_name' => trans('general.purchase_date'),'fieldname' => 'purchase_date'])
 
 <!-- Expiration Date -->
@@ -108,28 +107,7 @@
     </div>
 </div>
 
-{{-- @TODO How does this differ from Order #? --}}
-<!-- Purchase Order -->
-<div class="form-group {{ $errors->has('purchase_order') ? ' has-error' : '' }}">
-    <label for="purchase_order" class="col-md-3 control-label">{{ trans('admin/licenses/form.purchase_order') }}</label>
-    <div class="col-md-3 text-right">
-        <input class="form-control" type="text" name="purchase_order" id="purchase_order" value="{{ old('purchase_order', $item->purchase_order) }}" maxlength="191" />
-        {!! $errors->first('purchase_order', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
-    </div>
-</div>
 
-@include ('partials.forms.edit.depreciation')
-
-<!-- Maintained -->
-<div class="form-group {{ $errors->has('maintained') ? ' has-error' : '' }}">
-    <div class="col-md-3 control-label"><strong>{{ trans('admin/licenses/form.maintained') }}</strong></div>
-    <div class="col-md-7">
-        <label class="form-control">
-            <input type="checkbox" name="maintained" value="1" aria-label="maintained" @checked(old('maintained', $item->maintained))>
-        {{ trans('general.yes') }}
-        </label>
-    </div>
-</div>
 
 @include ('partials.forms.edit.notes')
 

@@ -213,7 +213,6 @@ class Importer extends Component
             'asset_model' => trans('general.model_name'),
             'asset_notes' => trans('general.item_notes', ['item' => trans('admin/hardware/general.asset')]),
             'asset_tag' => trans('general.asset_tag'),
-            'byod' => trans('general.byod'),
             'category' => trans('general.category'),
             'company' => trans('general.company'),
             'image' => trans('general.importer.image_filename'),

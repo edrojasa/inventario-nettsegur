@@ -100,7 +100,6 @@ class BulkAssetsController extends Controller
             'checkout_counter',
             'checkin_counter',
             'requests_counter',
-            'byod',
             'asset_eol_date',
         ];
 
