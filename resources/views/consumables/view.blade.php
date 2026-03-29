@@ -3,8 +3,8 @@
 {{-- Page title --}}
 @section('title')
   {{ $consumable->name }}
-  {{ trans('general.consumable') }} -
-  ({{ trans('general.remaining_var', ['count' => $consumable->numRemaining()])  }})
+  — {{ trans('general.consumable') }}
+  — {{ trans('general.remaining_var', ['count' => $consumable->numRemaining()]) }}
   @parent
 @endsection
 
@@ -21,18 +21,18 @@
                 <x-slot:tabnav>
 
                     <x-tabs.nav-item
-                            name="assigned"
+                            name="delivery_transactions"
                             class="active"
-                            icon_type="checkedout"
-                            label="{{ trans('general.assigned') }}"
-                            count="{{ $consumable->numCheckedOut() }}"
+                            icon_type=""
+                            label="Entregas"
                     />
 
                     <x-tabs.nav-item
-                            name="delivery_transactions"
+                            name="assigned"
                             class=""
-                            icon_type=""
-                            label="Transacciones"
+                            icon_type="checkedout"
+                            label="{{ trans('general.assigned') }}"
+                            count="{{ $consumable->numCheckedOut() }}"
                     />
 
                     <x-tabs.files-tab count="{{ $consumable->uploads()->count() }}" />
@@ -47,20 +47,9 @@
 
                 <x-slot:tabpanes>
 
-                    <x-tabs.pane name="assigned" class="in active">
-
-                        <x-slot:content>
-                            <x-table
-                                    :presenter="\App\Presenters\ConsumablePresenter::checkedOut()"
-                                    :api_url="route('api.consumables.show.users', $consumable->id)"
-                            />
-                        </x-slot:content>
-
-                    </x-tabs.pane>
-
-                    <x-tabs.pane name="delivery_transactions" class="">
+                    <x-tabs.pane name="delivery_transactions" class="in active">
                         <x-slot:header>
-                            Transacciones
+                            Registro de entregas
                         </x-slot:header>
                         <x-slot:content>
                             <div class="table-responsive">
@@ -106,6 +95,17 @@
                                 </table>
                             </div>
                         </x-slot:content>
+                    </x-tabs.pane>
+
+                    <x-tabs.pane name="assigned" class="">
+
+                        <x-slot:content>
+                            <x-table
+                                    :presenter="\App\Presenters\ConsumablePresenter::checkedOut()"
+                                    :api_url="route('api.consumables.show.users', $consumable->id)"
+                            />
+                        </x-slot:content>
+
                     </x-tabs.pane>
 
                     <x-tabs.pane name="files">

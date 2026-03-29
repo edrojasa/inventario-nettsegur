@@ -6,8 +6,9 @@ use App\Events\CheckoutableCheckedOut;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Consumable;
-use App\Models\User;
 use App\Models\ConsumableTransaction;
+use App\Models\Location;
+use App\Models\User;
 use Illuminate\Http\Request;
 use \Illuminate\Contracts\View\View;
 use \Illuminate\Http\RedirectResponse;
@@ -71,91 +72,101 @@ class ConsumableCheckoutController extends Controller
 
         $this->authorize('checkout', $consumable);
 
-        // If the quantity is not present in the request or is not a positive integer, set it to 1
         $quantity = $request->input('checkout_qty');
-        if (!isset($quantity) || !ctype_digit((string)$quantity) || $quantity <= 0) {
+        if (! isset($quantity) || ! ctype_digit((string) $quantity) || (int) $quantity <= 0) {
             $quantity = 1;
         }
+        $quantity = (int) $quantity;
 
-        // Make sure there is at least one available to checkout
         if ($consumable->numRemaining() <= 0 || $quantity > $consumable->numRemaining()) {
-            return redirect()->route('consumables.index')->with('error', trans('admin/consumables/message.checkout.unavailable', ['requested' => $quantity, 'remaining' => $consumable->numRemaining() ]));
+            return redirect()->route('consumables.index')->with('error', trans('admin/consumables/message.checkout.unavailable', ['requested' => $quantity, 'remaining' => $consumable->numRemaining()]));
         }
 
-        $admin_user = auth()->user();
-        
+        $adminUser = auth()->user();
+        if (! $adminUser) {
+            return redirect()->guest(route('login'));
+        }
+
         $targetType = $request->input('checkout_to_type', 'user');
+        if (! in_array($targetType, ['user', 'location'], true)) {
+            return redirect()->route('consumables.checkout.show', $consumable)
+                ->with('error', trans('validation.in', ['attribute' => 'checkout_to_type']))
+                ->withInput();
+        }
+
+        $user = null;
+        $userId = null;
+        $locationId = null;
 
         if ($targetType === 'user') {
-            $assigned_to = e($request->input('assigned_to'));
-            if (is_null($user = User::find($assigned_to))) {
-                return redirect()->route('consumables.checkout.show', $consumable)->with('error', trans('admin/consumables/message.checkout.user_does_not_exist'))->withInput();
-            }
-        } elseif ($targetType === 'location') {
-            $assigned_to = e($request->input('assigned_location'));
-            if (is_null($location = \App\Models\Location::find($assigned_to))) {
-                return redirect()->route('consumables.checkout.show', $consumable)->with('error', 'La locación seleccionada no existe.')->withInput();
+            $userId = (int) $request->input('assigned_to');
+            if ($userId < 1 || is_null($user = User::find($userId))) {
+                return redirect()->route('consumables.checkout.show', $consumable)
+                    ->with('error', trans('admin/consumables/message.checkout.user_does_not_exist'))
+                    ->withInput();
             }
         } else {
-            return redirect()->route('consumables.checkout.show', $consumable)->with('error', 'Tipo de destino inválido.')->withInput();
+            $locationId = (int) $request->input('assigned_location');
+            if ($locationId < 1 || ! Location::whereKey($locationId)->exists()) {
+                return redirect()->route('consumables.checkout.show', $consumable)
+                    ->with('error', trans('admin/locations/message.does_not_exist'))
+                    ->withInput();
+            }
         }
 
-        // DB Transaction for safety
-        DB::transaction(function () use ($consumable, $quantity, $targetType, $assigned_to, $admin_user, $request) {
-            
-            // 1. Native insertion ONLY for users (to maintain Snipe-IT compatibility)
+        $note = $request->input('note');
+        $checkoutTransactionId = null;
+
+        DB::transaction(function () use ($consumable, $quantity, $targetType, $userId, $locationId, $adminUser, $note, &$checkoutTransactionId) {
             if ($targetType === 'user') {
-                $consumable->assigned_to = $assigned_to;
+                $consumable->assigned_to = $userId;
                 $records = [];
-                for ($i = 0; $i < $quantity; $i++){
+                for ($i = 0; $i < $quantity; $i++) {
                     $records[] = [
                         'consumable_id' => $consumable->id,
-                        'created_by' => $admin_user->id,
-                        'assigned_to' => $assigned_to,
-                        'note' => $request->input('note'),
+                        'created_by' => $adminUser->id,
+                        'assigned_to' => $userId,
+                        'note' => $note,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
                 }
-                // Bulk insert optimized
                 DB::table('consumables_users')->insert($records);
             }
 
-            // 2. Insert into our custom master table
             $transaction = ConsumableTransaction::create([
                 'consumable_id' => $consumable->id,
                 'type' => $targetType,
-                'user_id' => $targetType === 'user' ? $assigned_to : null,
-                'location_id' => $targetType === 'location' ? $assigned_to : null,
+                'user_id' => $targetType === 'user' ? $userId : null,
+                'location_id' => $targetType === 'location' ? $locationId : null,
+                'remision_id' => null,
                 'quantity' => $quantity,
                 'status' => 'entregado',
-                'assigned_by' => $admin_user->id,
-                'notes' => $request->input('note'),
+                'assigned_by' => $adminUser->id,
+                'notes' => $note,
             ]);
 
-            // Save the transaction id in the request to use it downstream
-            $request->merge(['_transaction_id' => $transaction->id]);
+            $checkoutTransactionId = $transaction->id;
         });
 
         $consumable->checkout_qty = $quantity;
 
-        // Dispatch native event (only if user)
-        if ($targetType === 'user' && isset($user)) {
+        if ($targetType === 'user' && $user) {
             event(new CheckoutableCheckedOut(
                 $consumable,
                 $user,
-                $admin_user,
-                $request->input('note'),
+                $adminUser,
+                $note,
                 [],
                 $consumable->checkout_qty,
             ));
-            
+
             $request->request->add(['checkout_to_type' => 'user']);
             $request->request->add(['assigned_user' => $user->id]);
         }
 
-        if ($request->filled('generate_remision')) {
-            return redirect()->route('remision.show', ['consumables' => [$request->input('_transaction_id')]]);
+        if ($request->filled('generate_remision') && $checkoutTransactionId !== null) {
+            return redirect()->route('remision.show', ['consumables' => [$checkoutTransactionId]]);
         }
 
         session()->put(['redirect_option' => $request->input('redirect_option'), 'checkout_to_type' => $request->input('checkout_to_type')]);

@@ -13,7 +13,6 @@
 <div class="row">
     <div class="col-md-12">
         <div class="box box-default">
-            <!-- /.box-header -->
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
@@ -28,126 +27,147 @@
 
 <div class="row">
 
-    <!-- panel -->
     <div class="col-lg-2 col-xs-6">
+        @if ($counts['asset'] !== null)
         <a href="{{ route('hardware.index') }}">
-            <!-- small hardware box -->
-            <div class="dashboard small-box bg-teal">
+        @endif
+            <div class="dashboard small-box bg-teal" @if($counts['asset'] === null) style="opacity:0.65" @endif>
                 <div class="inner">
-                    <h3>{{ number_format(\App\Models\Asset::AssetsForShow()->count()) }}</h3>
+                    <h3>{{ $counts['asset'] !== null ? number_format($counts['asset']) : '—' }}</h3>
                     <p>{{ trans('general.assets') }}</p>
                 </div>
                 <div class="icon" aria-hidden="true">
                     <x-icon type="assets" />
                 </div>
+                @if ($counts['asset'] !== null)
                 <span class="small-box-footer">
                     {{ trans('general.view_all') }}
                     <x-icon type="arrow-circle-right" />
                 </span>
+                @endif
             </div>
+        @if ($counts['asset'] !== null)
         </a>
-    </div><!-- ./col -->
+        @endif
+    </div>
 
     <div class="col-lg-2 col-xs-6">
-        <a href="{{ route('licenses.index') }}" aria-hidden="true">
-            <!-- small license box -->
-            <div class="dashboard small-box bg-maroon">
+        @if ($counts['license'] !== null)
+        <a href="{{ route('licenses.index') }}">
+        @endif
+            <div class="dashboard small-box bg-maroon" @if($counts['license'] === null) style="opacity:0.65" @endif>
                 <div class="inner">
-                    <h3>{{ number_format($counts['license']) }}</h3>
+                    <h3>{{ $counts['license'] !== null ? number_format($counts['license']) : '—' }}</h3>
                     <p>{{ trans('general.licenses') }}</p>
                 </div>
                 <div class="icon" aria-hidden="true">
                     <x-icon type="licenses" />
                 </div>
+                @if ($counts['license'] !== null)
                 <span class="small-box-footer">
                     {{ trans('general.view_all') }}
                     <x-icon type="arrow-circle-right" />
                 </span>
+                @endif
             </div>
+        @if ($counts['license'] !== null)
         </a>
-    </div><!-- ./col -->
-
+        @endif
+    </div>
 
     <div class="col-lg-2 col-xs-6">
-    <!-- small accessories box -->
+        @if ($counts['accessory'] !== null)
         <a href="{{ route('accessories.index') }}">
-            <div class="dashboard small-box bg-orange">
+        @endif
+            <div class="dashboard small-box bg-orange" @if($counts['accessory'] === null) style="opacity:0.65" @endif>
                 <div class="inner">
-                    <h3> {{ number_format($counts['accessory']) }}</h3>
+                    <h3>{{ $counts['accessory'] !== null ? number_format($counts['accessory']) : '—' }}</h3>
                     <p>{{ trans('general.accessories') }}</p>
                 </div>
                 <div class="icon" aria-hidden="true">
                     <x-icon type="accessories" />
                 </div>
+                @if ($counts['accessory'] !== null)
                 <span class="small-box-footer">
                     {{ trans('general.view_all') }}
-                <x-icon type="arrow-circle-right" />
+                    <x-icon type="arrow-circle-right" />
                 </span>
+                @endif
             </div>
+        @if ($counts['accessory'] !== null)
         </a>
-    </div><!-- ./col -->
+        @endif
+    </div>
 
     <div class="col-lg-2 col-xs-6">
-    <!-- small consumables box -->
+        @if ($counts['consumable'] !== null)
         <a href="{{ route('consumables.index') }}">
-            <div class="dashboard small-box bg-purple">
+        @endif
+            <div class="dashboard small-box bg-purple" @if($counts['consumable'] === null) style="opacity:0.65" @endif>
                 <div class="inner">
-                    <h3> {{ number_format($counts['consumable']) }}</h3>
+                    <h3>{{ $counts['consumable'] !== null ? number_format($counts['consumable']) : '—' }}</h3>
                     <p>{{ trans('general.consumables') }}</p>
                 </div>
                 <div class="icon" aria-hidden="true">
                     <x-icon type="consumables" />
                 </div>
+                @if ($counts['consumable'] !== null)
                 <span class="small-box-footer">
                     {{ trans('general.view_all') }}
                     <x-icon type="arrow-circle-right" />
                 </span>
+                @endif
             </div>
+        @if ($counts['consumable'] !== null)
         </a>
-    </div><!-- ./col -->
-
-    {{-- <div class="col-lg-2 col-xs-6">
-        <!-- small components box -->
-        <a href="{{ route('components.index') }}">
-            <div class="dashboard small-box bg-yellow">
-                <div class="inner">
-                    <h3>{{ number_format($counts['component']) }}</h3>
-                    <p>{{ trans('general.components') }}</p>
-                </div>
-                <div class="icon" aria-hidden="true">
-                    <x-icon type="components" />
-                </div>
-                <span class="small-box-footer">
-                    {{ trans('general.view_all') }}
-                    <x-icon type="arrow-circle-right" />
-                </span>
-            </div>
-        </a>
-    </div> --}}<!-- ./col -->
+        @endif
+    </div>
 
     <div class="col-lg-2 col-xs-6">
-        <!-- small users box -->
-        <a href="{{ route('users.index') }}">
-            <div class="dashboard small-box bg-light-blue">
+        <a href="{{ route('remisiones.index') }}">
+            <div class="dashboard small-box bg-navy">
                 <div class="inner">
-                    <h3>{{ number_format($counts['user']) }}</h3>
+                    <h3>{{ number_format($counts['remisiones_7d'] ?? 0) }}</h3>
+                    <p>{{ trans('dashboard.kpi_remisiones_7d') }}</p>
+                </div>
+                <div class="icon" aria-hidden="true">
+                    <x-icon type="order" />
+                </div>
+                <span class="small-box-footer">
+                    {{ trans('dashboard.kpi_remisiones_footer') }}
+                    <x-icon type="arrow-circle-right" />
+                </span>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-lg-2 col-xs-6">
+        @if ($counts['user'] !== null)
+        <a href="{{ route('users.index') }}">
+        @endif
+            <div class="dashboard small-box bg-light-blue" @if($counts['user'] === null) style="opacity:0.65" @endif>
+                <div class="inner">
+                    <h3>{{ $counts['user'] !== null ? number_format($counts['user']) : '—' }}</h3>
                     <p>{{ trans('general.people') }}</p>
                 </div>
                 <div class="icon" aria-hidden="true">
                     <x-icon type="users" />
                 </div>
+                @if ($counts['user'] !== null)
                 <span class="small-box-footer">
                     {{ trans('general.view_all') }}
                     <x-icon type="arrow-circle-right" />
                 </span>
+                @endif
             </div>
+        @if ($counts['user'] !== null)
         </a>
-    </div><!-- ./col -->
+        @endif
+    </div>
 
 </div>
-</div>
 
-@if ($counts['grand_total'] == 0)
+@if ($showInventoryOnboarding ?? false)
 
     <div class="row">
         <div class="col-md-12">
@@ -155,7 +175,6 @@
                 <div class="box-header with-border">
                     <h2 class="box-title">{{ trans('general.dashboard_info') }}</h2>
                 </div>
-                <!-- /.box-header -->
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-12">
@@ -210,9 +229,10 @@
 
 @else
 
-<!-- recent activity -->
+@if (($showActivityReportTable ?? false) || ($showFullSnipeWidgets ?? false))
 <div class="row">
-  <div class="col-md-8">
+  @if ($showActivityReportTable ?? false)
+  <div class="{{ ($showFullSnipeWidgets ?? false) ? 'col-md-8' : 'col-md-12' }}">
     <div class="box box-default">
       <div class="box-header with-border">
         <h2 class="box-title">{{ trans('general.recent_activity') }}</h2>
@@ -222,7 +242,7 @@
                 <span class="sr-only">{{ trans('general.collapse') }}</span>
             </button>
         </div>
-      </div><!-- /.box-header -->
+      </div>
       <div class="box-body">
         <div class="row">
           <div class="col-md-12">
@@ -252,15 +272,17 @@
                     </tr>
                     </thead>
                 </table>
-          </div><!-- /.col -->
+          </div>
           <div class="text-center col-md-12" style="padding-top: 10px;">
             <a href="{{ route('reports.activity') }}" class="btn btn-theme btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
           </div>
-        </div><!-- /.row -->
-      </div><!-- ./box-body -->
-    </div><!-- /.box -->
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="col-md-4">
+  @endif
+  @if ($showFullSnipeWidgets ?? false)
+  <div class="{{ ($showActivityReportTable ?? false) ? 'col-md-4' : 'col-md-12' }}">
         <div class="box box-default">
             <div class="box-header with-border">
                 <h2 class="box-title">
@@ -273,25 +295,27 @@
                     </button>
                 </div>
             </div>
-            <!-- /.box-header -->
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="chart-responsive">
                             <canvas id="statusPieChart" height="260"></canvas>
-                        </div> <!-- ./chart-responsive -->
-                    </div> <!-- /.col -->
-                </div> <!-- /.row -->
-            </div><!-- /.box-body -->
-        </div> <!-- /.box -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
   </div>
+  @endif
 
-</div> <!--/row-->
+</div>
+@endif
+
+@if ($showFullSnipeWidgets ?? false)
 <div class="row">
     <div class="col-md-6">
 
 		@if ((($snipeSettings->scope_locations_fmcs!='1') && ($snipeSettings->full_multiple_companies_support=='1')))
-			 <!-- Companies -->	
 			<div class="box box-default">
 				<div class="box-header with-border">
 					<h2 class="box-title">{{ trans('general.companies') }}</h2>
@@ -302,7 +326,6 @@
 						</button>
 					</div>
 				</div>
-				<!-- /.box-header -->
 				<div class="box-body">
 					<div class="row">
 						<div class="col-md-12">
@@ -350,20 +373,19 @@
 								</tr>
 								</thead>
 							</table>
-						</div> <!-- /.col -->
+						</div>
 						<div class="text-center col-md-12" style="padding-top: 10px;">
 							<a href="{{ route('companies.index') }}" class="btn btn-theme btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
 						</div>
-					</div> <!-- /.row -->
+					</div>
 
-				</div><!-- /.box-body -->
-			</div> <!-- /.box -->
-		
+				</div>
+			</div>
+
 		@else
-			 <!-- Locations -->
 			 <div class="box box-default">
 				<div class="box-header with-border">
-					<h2 class="box-title">{{ trans('general.locations') }}</h2>
+					<h2 class="box-title">{{ trans('dashboard.locations_box_title') }}</h2>
 					<div class="box-tools pull-right">
 						<button type="button" class="btn btn-box-tool" data-widget="collapse">
                             <x-icon type="minus" />
@@ -371,7 +393,6 @@
 						</button>
 					</div>
 				</div>
-				<!-- /.box-header -->
 				<div class="box-body">
 					<div class="row">
 						<div class="col-md-12">
@@ -387,47 +408,42 @@
 									data-sort-field="assets_count"
 									id="dashLocationSummary"
                                     data-show-columns="false"
-									class="table table-striped snipe-table"
-									data-url="{{ route('api.locations.index', ['sort' => 'assets_count', 'order' => 'asc']) }}">
+									class="table table-striped snipe-table table-dashboard-summary"
+									data-url="{{ route('api.locations.index', ['sort' => 'assets_count', 'order' => 'desc']) }}">
 								<thead>
 								<tr>
-									<th class="col-sm-3" data-visible="true" data-field="name" data-formatter="locationsLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
-									
-									<th class="col-sm-1" data-visible="true" data-field="assets_count" data-sortable="true">
+									<th class="col-sm-4" data-visible="true" data-field="name" data-formatter="locationsLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
+									<th class="col-sm-2 text-center" data-visible="true" data-field="assets_count" data-sortable="true" data-formatter="dashboardAssetCountBadgeFormatter" data-align="center">
                                         <x-icon type="assets" />
-										<span class="sr-only">{{ trans('general.asset_count') }}</span>
+										<span class="sr-only">{{ trans('dashboard.th_equipment_count') }}</span>
 									</th>
-									<th class="col-sm-1" data-visible="true" data-field="assigned_assets_count" data-sortable="true">
-										
+									<th class="col-sm-2 text-center" data-visible="true" data-field="assigned_assets_count" data-sortable="true" data-align="center">
 										{{ trans('general.assigned') }}
 									</th>
-									<th class="col-sm-1" data-visible="true" data-field="users_count" data-sortable="true">
+									<th class="col-sm-2 text-center" data-visible="true" data-field="users_count" data-sortable="true" data-align="center">
                                         <x-icon type="users" />
 										<span class="sr-only">{{ trans('general.people') }}</span>
-										
 									</th>
-									
 								</tr>
 								</thead>
 							</table>
-						</div> <!-- /.col -->
+						</div>
 						<div class="text-center col-md-12" style="padding-top: 10px;">
 							<a href="{{ route('locations.index') }}" class="btn btn-theme btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
 						</div>
-					</div> <!-- /.row -->
+					</div>
 
-				</div><!-- /.box-body -->
-			</div> <!-- /.box -->
+				</div>
+			</div>
 
 		@endif
-			
+
     </div>
     <div class="col-md-6">
 
-        <!-- Categories -->
         <div class="box box-default">
             <div class="box-header with-border">
-                <h2 class="box-title">{{ trans('general.asset') }} {{ trans('general.categories') }}</h2>
+                <h2 class="box-title">{{ trans('dashboard.categories_equipment_title') }}</h2>
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse">
                         <x-icon type="minus" />
@@ -435,7 +451,6 @@
                     </button>
                 </div>
             </div>
-            <!-- /.box-header -->
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
@@ -451,48 +466,33 @@
                                 data-sort-order="desc"
                                 data-sort-field="assets_count"
                                 id="dashCategorySummary"
-                                class="table table-striped snipe-table"
-                                data-url="{{ route('api.categories.index', ['sort' => 'assets_count', 'order' => 'asc']) }}">
+                                class="table table-striped snipe-table table-dashboard-summary"
+                                data-url="{{ route('api.categories.index', ['sort' => 'assets_count', 'order' => 'desc', 'category_type' => 'asset']) }}">
                             <thead>
                             <tr>
-                                <th class="col-sm-3" data-visible="true" data-field="name" data-formatter="categoriesLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
-                                <th class="col-sm-3" data-visible="true" data-field="category_type" data-sortable="true">
-                                    {{ trans('general.type') }}
-                                </th>
-                                <th class="col-sm-1" data-visible="true" data-field="assets_count" data-sortable="true">
+                                <th class="col-sm-6" data-visible="true" data-field="name" data-formatter="categoriesLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
+                                <th class="col-sm-2 text-center" data-visible="true" data-field="category_type" data-sortable="true" data-formatter="dashboardCategoryTypeBadgeFormatter">{{ trans('general.type') }}</th>
+                                <th class="col-sm-4 text-center" data-visible="true" data-field="assets_count" data-sortable="true" data-formatter="dashboardAssetCountBadgeFormatter" data-align="center">
                                     <x-icon type="assets" />
-                                    <span class="sr-only">{{ trans('general.asset_count') }}</span>
-                                </th>
-                                <th class="col-sm-1" data-visible="true" data-field="accessories_count" data-sortable="true">
-                                    <x-icon type="licenses" />
-                                    <span class="sr-only">{{ trans('general.accessories_count') }}</span>
-                                </th>
-                                <th class="col-sm-1" data-visible="true" data-field="consumables_count" data-sortable="true">
-                                    <x-icon type="consumables" />
-                                    <span class="sr-only">{{ trans('general.consumables_count') }}</span>
-                                </th>
-                                <th class="col-sm-1" data-visible="true" data-field="components_count" data-sortable="true">
-                                    <x-icon type="components" />
-                                    <span class="sr-only">{{ trans('general.components_count') }}</span>
-                                </th>
-                                <th class="col-sm-1" data-visible="true" data-field="licenses_count" data-sortable="true">
-                                    <x-icon type="licenses" />
-                                    <span class="sr-only">{{ trans('general.licenses_count') }}</span>
+                                    <span class="sr-only">{{ trans('dashboard.th_equipment_count') }}</span>
                                 </th>
                             </tr>
                             </thead>
                         </table>
 
-                    </div> <!-- /.col -->
+                    </div>
                     <div class="text-center col-md-12" style="padding-top: 10px;">
                         <a href="{{ route('categories.index') }}" class="btn btn-theme btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
                     </div>
-                </div> <!-- /.row -->
+                </div>
 
-            </div><!-- /.box-body -->
-        </div> <!-- /.box -->
+            </div>
+        </div>
     </div>
 
+
+</div>
+@endif
 
 @endif
 
@@ -500,12 +500,33 @@
 @stop
 
 @section('moar_scripts')
+<script nonce="{{ csrf_token() }}">
+    function dashboardAssetCountBadgeFormatter(value) {
+        var n = (value === null || value === undefined || value === '') ? 0 : parseInt(value, 10);
+        if (isNaN(n)) {
+            n = 0;
+        }
+        var cls = n > 0 ? 'label-success' : 'label-default';
+        return '<span class="label ' + cls + ' dashboard-asset-count-badge">' + n + '</span>';
+    }
+    function dashboardCategoryTypeBadgeFormatter(value) {
+        if (!value) {
+            return '';
+        }
+        var esc = String(value).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return '<span class="label label-default dashboard-category-type-badge">' + esc + '</span>';
+    }
+</script>
+<style nonce="{{ csrf_token() }}">
+    .table-dashboard-summary .dashboard-asset-count-badge { font-size: 13px; padding: 0.35em 0.65em; min-width: 2.25em; display: inline-block; }
+    .table-dashboard-summary .dashboard-category-type-badge { font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .table-dashboard-summary tbody td { vertical-align: middle !important; }
+</style>
 @include ('partials.bootstrap-table', ['simple_view' => true, 'nopages' => true])
 @stop
 
 @push('js')
-
-
+@if ($showFullSnipeWidgets ?? false)
         <script src="{{ url(mix('js/dist/Chart.min.js')) }}"></script>
 <script nonce="{{ csrf_token() }}">
     // ---------------------------
@@ -561,4 +582,5 @@
         last = current;
     });
 </script>
+@endif
 @endpush

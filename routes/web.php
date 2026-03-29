@@ -784,7 +784,7 @@ Route::middleware(['auth'])->get(
     );
 
     // 🔥 MÓDULO DE REMISIONES
-Route::prefix('remisiones')->group(function () {
+Route::middleware(['auth'])->prefix('remisiones')->group(function () {
     Route::get('/', [\App\Http\Controllers\DeliveryController::class, 'index'])->name('remisiones.index');
     Route::get('/{id}', [\App\Http\Controllers\DeliveryController::class, 'showDelivery'])->name('remisiones.show');
     Route::get('/{id}/pdf', [\App\Http\Controllers\DeliveryController::class, 'download'])->name('remisiones.pdf');

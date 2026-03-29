@@ -9,4 +9,5 @@ return array(
     'total' 			                => 'Total',
     'update'                            => 'Actualizar consumible',
     'inventory_warning'                 => 'El inventario de este consumible está por debajo de la cantidad mínima de :min_count',
+    'generate_remision_checkbox'        => 'Generar remisión automáticamente',
 );

@@ -76,8 +76,8 @@ public function index()
             $licenses = \App\Models\License::whereIn('id', $licenseIds)->get();
         }
 
-        if ($assets->isEmpty() && ! $accessoryId && $licenses->isEmpty()) {
-            abort(404, 'Indique al menos un equipo, accesorio o licencia.');
+        if ($assets->isEmpty() && ! $accessoryId && $licenses->isEmpty() && count($consumableIds) === 0) {
+            abort(404, 'Indique al menos un equipo, accesorio, licencia o consumible.');
         }
 
         $allAssetOptions = $assets->concat($relatedAssets)->unique('id')->values();
